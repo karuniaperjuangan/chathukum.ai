@@ -1,4 +1,4 @@
-import { pgTable, foreignKey, integer, varchar, unique } from "drizzle-orm/pg-core"
+import { pgTable, foreignKey, integer, varchar, unique,serial } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -47,3 +47,9 @@ export const lawUrl = pgTable("law_url", {
 		lawUrlIdKey: unique("law_url_id_key").on(table.id),
 	}
 });
+
+export const users = pgTable("users",{
+	id: serial().primaryKey(),
+	username: varchar().notNull(),
+	password: varchar().notNull(),
+})

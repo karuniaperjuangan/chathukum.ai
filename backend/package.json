@@ -23,17 +23,18 @@
   "dependencies": {
     "@langchain/core": "^0.3.17",
     "@langchain/openai": "^0.3.12",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/pdf-parse": "^1.1.4",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.36.1",
     "express": "^4.21.1",
+    "jsonwebtoken": "^9.0.2",
     "langchain": "^0.3.5",
     "pdf-parse": "^1.1.1",
-    "pdf2json": "^3.1.4",
-    "pdfjs-dist": "^2.0.550",
-    "pdfreader": "^3.0.5",
-    "pdftotextjs": "^0.5.1",
     "pg": "^8.13.1",
+    "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }
 }
