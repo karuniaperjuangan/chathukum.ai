@@ -2,6 +2,7 @@ import express from "express"
 import 'dotenv/config'
 import chatRouter from "./routes/chat"
 import lawRouter from './routes/law'
+import authRouter from './routes/auth'
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
 import { drizzle } from 'drizzle-orm/node-postgres';
@@ -16,7 +17,9 @@ app.get("/",(req,res)=>{
 })
 app.use("/chat", chatRouter)
 app.use("/laws", lawRouter)
+app.use("/auth", authRouter)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 app.listen(port,()=>{
     console.log(`Listening on port ${port}`)
 })

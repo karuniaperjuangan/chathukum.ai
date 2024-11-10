@@ -11,14 +11,14 @@ export async function registerUser(req:Request,res:Response) {
     const hashedPassword = await bcrypt.hash(password, 10); // Assuming you have bcrypt installed and set up
     
     if(!username || !password){
-        return res.status(400).json({message:"Username and password are required"});
+        res.status(400).json({message:"Username and password are required"});
     }
     
     try {
         const userExists = await db.select().from(users).where(eq(users.username, username)).execute();
         
         if(userExists.length > 0) {
-            return res.status(409).json({ message: "User already exists" });
+            res.status(409).json({ message: "User already exists" });
         }
 
         const newUser = await db.insert(users).values({
@@ -26,10 +26,10 @@ export async function registerUser(req:Request,res:Response) {
             password: hashedPassword
         }).returning()
 
-        return res.status(201).json(newUser);
+        res.status(201).json(newUser);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
     }
 }
 
@@ -37,21 +37,21 @@ export async function loginUser(req:Request,res:Response){
     const {username,password}=req.body;
     
     if(!username || !password){
-        return res.status(400).json({message:"Username and password are required"});
+        res.status(400).json({message:"Username and password are required"});
     }
 
     try {
         const user_results = await db.select().from(users).where(eq(users.username, username));
         
         if(user_results.length === 0) {
-            return res.status(401).json({ message: "Invalid username" });
+            res.status(401).json({ message: "Invalid username" });
         }
         const user = user_results[0];
         
         const isPasswordValid = await bcrypt.compare(password, user_results[0].password);
         
         if(!isPasswordValid){
-            return res.status(401).json({ message: "Invalid password" });
+            res.status(401).json({ message: "Invalid password" });
         }
 
         // Assuming you have a way to generate tokens
@@ -59,10 +59,10 @@ export async function loginUser(req:Request,res:Response){
             expiresIn:"12h" // Token expires in 1 hour
         })
 
-        return res.status(200).json({ token });
+        res.status(200).json({ token });
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Internal server error" });
     }
 }
