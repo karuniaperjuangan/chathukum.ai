@@ -1,6 +1,6 @@
 import express from "express"
 import 'dotenv/config'
-import router from "./routes/api"
+import chatRouter from "./routes/chat"
 import lawRouter from './routes/law'
 import swaggerUi from 'swagger-ui-express';
 import swaggerDocument from './swagger.json';
@@ -11,7 +11,10 @@ const app = express()
 app.use(express.json())
 const port = process.env.PORT || 3000
 
-app.use("/",router)
+app.get("/",(req,res)=>{
+    res.send("Hello World!")
+})
+app.use("/chat", chatRouter)
 app.use("/laws", lawRouter)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.listen(port,()=>{

@@ -59,4 +59,22 @@ async function getLawByID(req:Request,res:Response) {
     }
 };
 
-export {getAllLaws, getLawByID};
+async function getFiltersInformation(req:Request,res:Response) {
+    try{
+        const types = await db.selectDistinct({type: lawData.type}).from(lawData).orderBy(lawData.type)
+        const regions = await db.selectDistinct({region: lawData.region}).from(lawData).orderBy(lawData.region)
+        const years = await db.selectDistinct({year: lawData.year}).from(lawData).orderBy(lawData.year)
+        const categories = await db.selectDistinct({category: lawData.category}).from(lawData).orderBy(lawData.category)
+
+        res.status(200).json({
+            types:types.map((t:any) => t.type ||''),
+            regions:regions.map((r:any) => r.region||''),
+            years:years.map((y:any) => y.year ||''),
+            categories:categories.map((c:any) => c.category||'')
+        });
+    } catch(error:any){
+        console.error(error);
+        res.status(500).json({error:error.message});
+    }
+}
+export {getAllLaws, getLawByID, getFiltersInformation};
