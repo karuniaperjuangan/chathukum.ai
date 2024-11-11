@@ -39,9 +39,11 @@ async function getAllLaws(req:Request,res:Response) {
         
         const laws = await query;
         res.status(200).json(laws);
+        return;
     } catch(error:any){
         console.error(error);
         res.status(500).json({error:error.message});
+        return;
     }    
 };
 
@@ -53,9 +55,11 @@ async function getLawByID(req:Request,res:Response) {
             res.status(404).json({error:'Law not found'});
         }
         res.status(200).json(law);
+        return;
     } catch(error:any){
         console.error(error);
         res.status(500).json({error:error.message});
+        return;
     }
 };
 

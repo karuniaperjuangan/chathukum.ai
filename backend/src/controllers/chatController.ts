@@ -40,8 +40,10 @@ export async function processLawPDF(req:Request,res:Response) {
         law_content = law_content.replace(RegExp(/(?<=[a-z],)\n/g)," ");
         law_content = law_content.trim();
         res.send(law_content);
+        return;
     } catch(error:any){
         console.error(error);
         res.status(500).json({error:error.message});
+        return;
     }
 };

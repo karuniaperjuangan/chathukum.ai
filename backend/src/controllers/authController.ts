@@ -6,19 +6,23 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
+process.env.SALT = process.env.JWT_SECRET || "this_is_a_secret_salt"
+
 export async function registerUser(req:Request,res:Response) {
     const {username,password}=req.body;
-    const hashedPassword = await bcrypt.hash(password, 10); // Assuming you have bcrypt installed and set up
+    const hashedPassword = bcrypt.hashSync(password, 10); // Assuming you have bcrypt installed and set up
     
     if(!username || !password){
         res.status(400).json({message:"Username and password are required"});
+        return;
     }
     
     try {
-        const userExists = await db.select().from(users).where(eq(users.username, username)).execute();
+        const userExists = await db.select().from(users).where(eq(users.username, username));
         
         if(userExists.length > 0) {
             res.status(409).json({ message: "User already exists" });
+            return;
         }
 
         const newUser = await db.insert(users).values({
@@ -27,9 +31,11 @@ export async function registerUser(req:Request,res:Response) {
         }).returning()
 
         res.status(201).json(newUser);
+        return;
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
+        return;
     }
 }
 
@@ -43,15 +49,17 @@ export async function loginUser(req:Request,res:Response){
     try {
         const user_results = await db.select().from(users).where(eq(users.username, username));
         
-        if(user_results.length === 0) {
+        if(user_results.length === 0 || !user_results[0]) {
             res.status(401).json({ message: "Invalid username" });
+            return;
         }
         const user = user_results[0];
-        
-        const isPasswordValid = await bcrypt.compare(password, user_results[0].password);
+        console.log(user)
+        const isPasswordValid = bcrypt.compareSync(password, user_results[0].password);
         
         if(!isPasswordValid){
             res.status(401).json({ message: "Invalid password" });
+            return;
         }
 
         // Assuming you have a way to generate tokens
