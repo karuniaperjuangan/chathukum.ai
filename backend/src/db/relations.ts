@@ -1,5 +1,23 @@
 import { relations } from "drizzle-orm/relations";
-import { lawData, lawStatus, lawUrl } from "./schema";
+import { lawData, lawVectordbStatus, lawStatus, lawUrl } from "./schema";
+
+export const lawVectordbStatusRelations = relations(lawVectordbStatus, ({one}) => ({
+	lawDatum: one(lawData, {
+		fields: [lawVectordbStatus.lawId],
+		references: [lawData.id]
+	}),
+}));
+
+export const lawDataRelations = relations(lawData, ({many}) => ({
+	lawVectordbStatuses: many(lawVectordbStatus),
+	lawStatuses_affectedLawId: many(lawStatus, {
+		relationName: "lawStatus_affectedLawId_lawData_id"
+	}),
+	lawStatuses_affectingLawId: many(lawStatus, {
+		relationName: "lawStatus_affectingLawId_lawData_id"
+	}),
+	lawUrls: many(lawUrl),
+}));
 
 export const lawStatusRelations = relations(lawStatus, ({one}) => ({
 	lawDatum_affectedLawId: one(lawData, {
@@ -12,16 +30,6 @@ export const lawStatusRelations = relations(lawStatus, ({one}) => ({
 		references: [lawData.id],
 		relationName: "lawStatus_affectingLawId_lawData_id"
 	}),
-}));
-
-export const lawDataRelations = relations(lawData, ({many}) => ({
-	lawStatuses_affectedLawId: many(lawStatus, {
-		relationName: "lawStatus_affectedLawId_lawData_id"
-	}),
-	lawStatuses_affectingLawId: many(lawStatus, {
-		relationName: "lawStatus_affectingLawId_lawData_id"
-	}),
-	lawUrls: many(lawUrl),
 }));
 
 export const lawUrlRelations = relations(lawUrl, ({one}) => ({

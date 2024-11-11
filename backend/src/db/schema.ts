@@ -1,7 +1,28 @@
-import { pgTable, foreignKey, integer, varchar, unique,serial } from "drizzle-orm/pg-core"
+import { pgTable, serial, varchar, foreignKey, integer, boolean, date, unique } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
+
+export const users = pgTable("users", {
+	id: serial().primaryKey().notNull(),
+	username: varchar().notNull(),
+	password: varchar().notNull(),
+});
+
+export const lawVectordbStatus = pgTable("law_vectordb_status", {
+	id: integer().primaryKey().generatedAlwaysAsIdentity({ name: "law_vectordb_status_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
+	lawId: integer("law_id").notNull(),
+	hasVectordbRecord: boolean("has_vectordb_record").default(false).notNull(),
+	lastUpdated: date("last_updated").defaultNow().notNull(),
+}, (table) => {
+	return {
+		fkLawIdVectordbStatus: foreignKey({
+			columns: [table.lawId],
+			foreignColumns: [lawData.id],
+			name: "fk_law_id_vectordb_status"
+		}),
+	}
+});
 
 export const lawStatus = pgTable("law_status", {
 	affectedLawId: integer("affected_law_id"),
@@ -47,9 +68,3 @@ export const lawUrl = pgTable("law_url", {
 		lawUrlIdKey: unique("law_url_id_key").on(table.id),
 	}
 });
-
-export const users = pgTable("users",{
-	id: serial().primaryKey(),
-	username: varchar().notNull(),
-	password: varchar().notNull(),
-})
