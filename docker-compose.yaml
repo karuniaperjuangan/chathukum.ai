@@ -11,6 +11,14 @@ services:
       - POSTGRES_PASSWORD=mysecretpassword
       - POSTGRES_USER=myusername
       - POSTGRES_DB=law
+  chroma:
+    image: chromadb/chroma:0.5.10
+    ports:
+      - 8000:8000
+    volumes:
+      - chroma-data:/chroma/chroma
+
 
 volumes:
   postgres-volume:
+  chroma-data:

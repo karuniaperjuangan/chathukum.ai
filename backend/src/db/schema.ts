@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, foreignKey, integer, boolean, date, unique } from "drizzle-orm/pg-core"
+import { pgTable, serial, varchar, foreignKey, unique, integer, boolean, date } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
@@ -21,6 +21,7 @@ export const lawVectordbStatus = pgTable("law_vectordb_status", {
 			foreignColumns: [lawData.id],
 			name: "fk_law_id_vectordb_status"
 		}),
+		lawVectordbStatusUnique: unique("law_vectordb_status_unique").on(table.lawId),
 	}
 });
 
