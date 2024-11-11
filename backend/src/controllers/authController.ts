@@ -74,3 +74,47 @@ export async function loginUser(req:Request,res:Response){
         res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export async function getUser(req:Request,res:Response){
+    const userId = req.user?.id;
+    console.log(userId)
+    if(!userId){
+        res.status(400).json({message:"User ID is required"});
+    }
+
+    try {
+        const user_results = await db.select().from(users).where(eq(users.id, parseInt(userId)));
+        
+        if(user_results.length === 0 || !user_results[0]) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        const user = user_results[0];
+        res.status(200).json(user);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function refreshToken(req:Request,res:Response){
+    const userId = req.user?.id;
+    if(!userId){
+        res.status(400).json({message:"User ID is required"});
+        return;
+    }
+
+    try {
+        // Assuming you have a way to generate tokens
+        const token = jwt.sign({id:userId}, process.env.JWT_SECRET || 'secretToken',{
+            expiresIn:"12h" // Token expires in 1 hour
+        })
+
+        res.status(200).json({ token });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
