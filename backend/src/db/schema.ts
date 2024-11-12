@@ -1,13 +1,8 @@
-import { pgTable, serial, varchar, foreignKey, unique, integer, boolean, date } from "drizzle-orm/pg-core"
+import { pgTable, foreignKey, unique, integer, boolean, date, serial, varchar, pgEnum } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
-
-export const users = pgTable("users", {
-	id: serial().primaryKey().notNull(),
-	username: varchar().notNull(),
-	password: varchar().notNull(),
-});
+export const rolesEnum = pgEnum("roles", ["system", "human", "ai"]);
 
 export const lawVectordbStatus = pgTable("law_vectordb_status", {
 	id: integer().primaryKey().generatedAlwaysAsIdentity({ name: "law_vectordb_status_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
@@ -20,8 +15,30 @@ export const lawVectordbStatus = pgTable("law_vectordb_status", {
 			columns: [table.lawId],
 			foreignColumns: [lawData.id],
 			name: "fk_law_id_vectordb_status"
-		}),
+		}).onUpdate("cascade").onDelete("cascade"),
 		lawVectordbStatusUnique: unique("law_vectordb_status_unique").on(table.lawId),
+	}
+});
+
+export const users = pgTable("users", {
+	id: serial().primaryKey().notNull(),
+	username: varchar().notNull(),
+	password: varchar().notNull(),
+	email: varchar().notNull(),
+});
+
+export const messages = pgTable("messages", {
+	id: integer().primaryKey().generatedAlwaysAsIdentity({ name: "messages_id_seq", startWith: 1, increment: 1, minValue: 1, maxValue: 2147483647, cache: 1 }),
+	chatHistoryId: integer("chat_history_id").notNull(),
+	message_role: rolesEnum().notNull(),
+	content: varchar().notNull(),
+}, (table) => {
+	return {
+		fkChatHistoryId: foreignKey({
+			columns: [table.chatHistoryId],
+			foreignColumns: [chatHistory.id],
+			name: "fk_chat_history_id"
+		}),
 	}
 });
 
@@ -31,16 +48,16 @@ export const lawStatus = pgTable("law_status", {
 	status: varchar(),
 }, (table) => {
 	return {
-		fkAffectedLawId: foreignKey({
-			columns: [table.affectedLawId],
-			foreignColumns: [lawData.id],
-			name: "fk_affected_law_id"
-		}),
 		fkAffectingLawId: foreignKey({
 			columns: [table.affectingLawId],
 			foreignColumns: [lawData.id],
 			name: "fk_affecting_law_id"
 		}),
+		fkAffectedLawId: foreignKey({
+			columns: [table.affectedLawId],
+			foreignColumns: [lawData.id],
+			name: "fk_affected_law_id"
+		}).onUpdate("cascade").onDelete("cascade"),
 	}
 });
 
@@ -65,7 +82,21 @@ export const lawUrl = pgTable("law_url", {
 			columns: [table.lawId],
 			foreignColumns: [lawData.id],
 			name: "law_url_law_id_fkey"
-		}),
+		}).onUpdate("cascade").onDelete("cascade"),
 		lawUrlIdKey: unique("law_url_id_key").on(table.id),
+	}
+});
+
+export const chatHistory = pgTable("chat_history", {
+	id: serial().primaryKey().notNull(),
+	userId: integer("user_id").notNull(),
+	title: varchar({ length: 255 }).notNull(),
+}, (table) => {
+	return {
+		fkUserIdChatHistory: foreignKey({
+			columns: [table.userId],
+			foreignColumns: [users.id],
+			name: "fk_user_id_chat_history"
+		}),
 	}
 });

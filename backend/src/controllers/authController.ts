@@ -9,7 +9,7 @@ import 'dotenv/config';
 process.env.SALT = process.env.SALT || process.env.JWT_SECRET || "this_is_a_secret_salt"
 
 export async function registerUser(req: Request, res: Response) {
-    const { username, password } = req.body;
+    const { username, password, email } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10); // Assuming you have bcrypt installed and set up
 
     if (!username || !password) {
@@ -27,6 +27,7 @@ export async function registerUser(req: Request, res: Response) {
 
         const newUser = await db.insert(users).values({
             username,
+            email,
             password: hashedPassword
         }).returning()
 
