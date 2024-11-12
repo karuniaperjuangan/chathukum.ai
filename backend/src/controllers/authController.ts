@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
 import { db } from '../db.ts';
-import { lawData, lawStatus, lawUrl, users } from '../db/schema.ts';
-import {eq, sql,and} from 'drizzle-orm';
+import { users } from '../db/schema.ts';
+import {eq} from 'drizzle-orm';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 
-process.env.SALT = process.env.JWT_SECRET || "this_is_a_secret_salt"
+process.env.SALT = process.env.SALT || process.env.JWT_SECRET || "this_is_a_secret_salt"
 
 export async function registerUser(req:Request,res:Response) {
     const {username,password}=req.body;
@@ -54,7 +54,6 @@ export async function loginUser(req:Request,res:Response){
             return;
         }
         const user = user_results[0];
-        console.log(user)
         const isPasswordValid = bcrypt.compareSync(password, user_results[0].password);
         
         if(!isPasswordValid){
@@ -64,7 +63,7 @@ export async function loginUser(req:Request,res:Response){
 
         // Assuming you have a way to generate tokens
         const token = jwt.sign({id:user.id}, process.env.JWT_SECRET || 'secretToken',{
-            expiresIn:"12h" // Token expires in 1 hour
+            expiresIn:"12h" // Token expires in 12 hour
         })
 
         res.status(200).json({ token });
@@ -77,7 +76,6 @@ export async function loginUser(req:Request,res:Response){
 
 export async function getUser(req:Request,res:Response){
     const userId = req.user?.id;
-    console.log(userId)
     if(!userId){
         res.status(400).json({message:"User ID is required"});
     }
@@ -108,7 +106,7 @@ export async function refreshToken(req:Request,res:Response){
     try {
         // Assuming you have a way to generate tokens
         const token = jwt.sign({id:userId}, process.env.JWT_SECRET || 'secretToken',{
-            expiresIn:"12h" // Token expires in 1 hour
+            expiresIn:"12h" // Token expires in 12 hour
         })
 
         res.status(200).json({ token });
