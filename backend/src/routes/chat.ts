@@ -1,7 +1,7 @@
 import express from "express"
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import {processLawPDF, retrieveLawContent, chatWithLawAssistant} from '../controllers/chatController'
+import { processLawPDF, retrieveLawContent, chatWithLawAssistant } from '../controllers/chatController'
 const router = express.Router()
 
 /**
@@ -71,7 +71,7 @@ const router = express.Router()
  *                   example: "Question is required."
  */
 
-router.post("/ask-chatbot",chatWithLawAssistant)
+router.post("/ask-chatbot", chatWithLawAssistant)
 
 /**
  * Retrieves law content based on a query.
@@ -150,6 +150,6 @@ router.post("/retrieve-content", retrieveLawContent)
  *                 error:
  *                   type: string
  */
-router.post("/process-pdf",processLawPDF)
+router.post("/process-pdf", processLawPDF)
 
 export default router

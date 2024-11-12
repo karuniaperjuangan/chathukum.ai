@@ -29,8 +29,13 @@ export async function retrieveLawContent(req: Request, res: Response) {
         const ids = await uploadMultipleLaws(lawIds);
         const result = (await chromaVectorStore.similaritySearchWithScore(query, 10, {
             "$or": (lawIds.map(id => ({ lawId: id }))
-                .concat([{ lawId: lawIds[0] }])) // to make sure that at least two laws are returned
-        })).filter(item => item[1] < 0.45) // filter out results with cosine distance greater than 0.45
+                .concat([{ lawId: lawIds[0] }
+                ]
+                )
+            ) // to make sure that at least two laws are returned
+        }
+        )
+        ).filter(item => item[1] < 0.45) // filter out results with cosine distance greater than 0.45
         res.status(200).json(result);
         return;
     } catch (error: any) {

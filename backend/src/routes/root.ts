@@ -11,7 +11,7 @@ const router = Router();
  *       '200':
  *         description: A successful response
  */
-router.get("/",(req,res)=>{
+router.get("/", (req, res) => {
     res.send("Hello World!")
 })
 

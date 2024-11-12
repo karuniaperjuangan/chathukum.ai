@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser,refreshToken} from "../controllers/authController";
+import { registerUser, loginUser, refreshToken } from "../controllers/authController";
 import { authenticateToken } from "../../middleware/auth";
 
 const router = Router();
@@ -99,7 +99,7 @@ router.post("/login", loginUser);
  *       403:
  *         description: Unauthorized
  */
-router.get("/check",authenticateToken, (req,res)=>{
+router.get("/check", authenticateToken, (req, res) => {
     res.json({ message: "Authenticated successfully" });
     return;
 }); // Protected route to test authentication middleware
@@ -128,6 +128,6 @@ router.get("/check",authenticateToken, (req,res)=>{
  *       500:
  *         description: Internal server error
  */
-router.get("/refresh",authenticateToken, refreshToken);
+router.get("/refresh", authenticateToken, refreshToken);
 
 export default router;
