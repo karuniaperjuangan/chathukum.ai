@@ -38,7 +38,7 @@ export const messages = pgTable("messages", {
 			columns: [table.chatHistoryId],
 			foreignColumns: [chatHistory.id],
 			name: "fk_chat_history_id"
-		}),
+		}).onUpdate("cascade").onDelete("cascade"),
 	}
 });
 
@@ -97,6 +97,6 @@ export const chatHistory = pgTable("chat_history", {
 			columns: [table.userId],
 			foreignColumns: [users.id],
 			name: "fk_user_id_chat_history"
-		}),
+		}).onUpdate("cascade").onDelete("cascade"),
 	}
 });
