@@ -1,59 +1,59 @@
 import { relations } from "drizzle-orm/relations";
-import { lawData, lawVectordbStatus, chatHistory, messages, lawStatus, lawUrl, users } from "./schema";
+import { lawDataTable, lawVectordbStatusTable, chatHistoryTable, messagesTable, lawStatusTable, lawUrlTable, usersTable } from "./schema";
 
-export const lawVectordbStatusRelations = relations(lawVectordbStatus, ({one}) => ({
-	lawDatum: one(lawData, {
-		fields: [lawVectordbStatus.lawId],
-		references: [lawData.id]
+export const lawVectordbStatusRelations = relations(lawVectordbStatusTable, ({one}) => ({
+	lawDatum: one(lawDataTable, {
+		fields: [lawVectordbStatusTable.lawId],
+		references: [lawDataTable.id]
 	}),
 }));
 
-export const lawDataRelations = relations(lawData, ({many}) => ({
-	lawVectordbStatuses: many(lawVectordbStatus),
-	lawStatuses_affectingLawId: many(lawStatus, {
+export const lawDataRelations = relations(lawDataTable, ({many}) => ({
+	lawVectordbStatuses: many(lawVectordbStatusTable),
+	lawStatuses_affectingLawId: many(lawStatusTable, {
 		relationName: "lawStatus_affectingLawId_lawData_id"
 	}),
-	lawStatuses_affectedLawId: many(lawStatus, {
+	lawStatuses_affectedLawId: many(lawStatusTable, {
 		relationName: "lawStatus_affectedLawId_lawData_id"
 	}),
-	lawUrls: many(lawUrl),
+	lawUrls: many(lawUrlTable),
 }));
 
-export const messagesRelations = relations(messages, ({one}) => ({
-	chatHistory: one(chatHistory, {
-		fields: [messages.chatHistoryId],
-		references: [chatHistory.id]
+export const messagesRelations = relations(messagesTable, ({one}) => ({
+	chatHistory: one(chatHistoryTable, {
+		fields: [messagesTable.chatHistoryId],
+		references: [chatHistoryTable.id]
 	}),
 }));
 
-export const chatHistoryRelations = relations(chatHistory, ({one, many}) => ({
-	messages: many(messages),
-	user: one(users, {
-		fields: [chatHistory.userId],
-		references: [users.id]
+export const chatHistoryRelations = relations(chatHistoryTable, ({one, many}) => ({
+	messages: many(messagesTable),
+	user: one(usersTable, {
+		fields: [chatHistoryTable.userId],
+		references: [usersTable.id]
 	}),
 }));
 
-export const lawStatusRelations = relations(lawStatus, ({one}) => ({
-	lawDatum_affectingLawId: one(lawData, {
-		fields: [lawStatus.affectingLawId],
-		references: [lawData.id],
+export const lawStatusRelations = relations(lawStatusTable, ({one}) => ({
+	lawDatum_affectingLawId: one(lawDataTable, {
+		fields: [lawStatusTable.affectingLawId],
+		references: [lawDataTable.id],
 		relationName: "lawStatus_affectingLawId_lawData_id"
 	}),
-	lawDatum_affectedLawId: one(lawData, {
-		fields: [lawStatus.affectedLawId],
-		references: [lawData.id],
+	lawDatum_affectedLawId: one(lawDataTable, {
+		fields: [lawStatusTable.affectedLawId],
+		references: [lawDataTable.id],
 		relationName: "lawStatus_affectedLawId_lawData_id"
 	}),
 }));
 
-export const lawUrlRelations = relations(lawUrl, ({one}) => ({
-	lawDatum: one(lawData, {
-		fields: [lawUrl.lawId],
-		references: [lawData.id]
+export const lawUrlRelations = relations(lawUrlTable, ({one}) => ({
+	lawDatum: one(lawDataTable, {
+		fields: [lawUrlTable.lawId],
+		references: [lawDataTable.id]
 	}),
 }));
 
-export const usersRelations = relations(users, ({many}) => ({
-	chatHistories: many(chatHistory),
+export const usersRelations = relations(usersTable, ({many}) => ({
+	chatHistories: many(chatHistoryTable),
 }));

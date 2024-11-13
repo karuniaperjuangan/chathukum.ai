@@ -1,8 +1,56 @@
 import express from "express"
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { processLawPDF, retrieveLawContent, chatWithLawAssistant } from '../controllers/chatController'
+import { processLawPDF, retrieveLawContent, chatWithLawAssistant, newChatHistory, appendChatHistory, deleteChatHistory, getChatHistory, listUserChatHistories } from '../controllers/chatController'
+import { authenticateToken } from "../../middleware/auth";
 const router = express.Router()
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ *   schemas:
+ *     ChatHistory:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *         title:
+ *           type: string
+ *         userId:
+ *           type: integer
+ *         lawIds:
+ *           type: array
+ *           items:
+ *             type: integer
+ *         messages:
+ *           type: array
+ *           items:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: integer
+ *               chatHistoryId:
+ *                 type: integer
+ *               content:
+ *                 type: string
+ *               message_role:
+ *                 type: string
+ *     Message:
+ *       type: object
+ *       properties:
+ *         chatHistoryId:
+ *           type: integer
+ *         content:
+ *           type: string
+ *         message_role:
+ *           type: string
+ */
+
 
 /**
  * @swagger
@@ -151,5 +199,204 @@ router.post("/retrieve-content", retrieveLawContent)
  *                   type: string
  */
 router.post("/process-pdf", processLawPDF)
+
+
+/**
+ * @swagger
+ * /chat/chat-history/new:
+ *   post:
+ *     summary: Create a new chat history
+ *     tags:
+ *       - Chat
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               messages:
+ *                 type: array
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *               law_ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *     responses:
+ *       '201':
+ *         description: Chat history created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ChatHistory'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.post("/chat-history/new", authenticateToken, newChatHistory)
+/**
+ * @swagger
+ * /chat/chat-history/update:
+ *   post:
+ *     summary: Append messages to an existing chat history
+ *     tags:
+ *       - Chat
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               appended_messages:
+ *                 type: array
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *               chat_history_id:
+ *                 type: string
+ *     responses:
+ *       '201':
+ *         description: Messages appended successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 chat_history_id:
+ *                   type: integer
+ *                 messages:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Message'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.post("/chat-history/update",authenticateToken, appendChatHistory)
+/**
+ * @swagger
+ * /chat/chat-history/get:
+ *   post:
+ *     summary: Get a specific chat history
+ *     tags:
+ *       - Chat
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               chat_history_id:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Chat history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ChatHistory'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.post("/chat-history/get", authenticateToken, getChatHistory)
+/**
+ * @swagger
+ * /chat/chat-history/delete:
+ *   delete:
+ *     summary: Delete a specific chat history
+ *     tags:
+ *       - Chat
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               chat_history_id:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Chat history and messages deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.delete("/chat-history/delete", authenticateToken, deleteChatHistory)
+/**
+ * @swagger
+ * /chat/chat-history/list:
+ *   get:
+ *     summary: List all chat histories for the user
+ *     tags:
+ *       - Chat
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: List of chat histories retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/ChatHistory'
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ */
+router.get("/chat-history/list", authenticateToken, listUserChatHistories)
 
 export default router

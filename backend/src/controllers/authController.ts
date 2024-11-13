@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { db } from '../db.ts';
-import { users } from '../db/schema.ts';
+import { usersTable } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
@@ -18,14 +18,14 @@ export async function registerUser(req: Request, res: Response) {
     }
 
     try {
-        const userExists = await db.select().from(users).where(eq(users.username, username));
+        const userExists = await db.select().from(usersTable).where(eq(usersTable.username, username));
 
         if (userExists.length > 0) {
             res.status(409).json({ message: "User already exists" });
             return;
         }
 
-        const newUser = await db.insert(users).values({
+        const newUser = await db.insert(usersTable).values({
             username,
             email,
             password: hashedPassword
@@ -48,7 +48,7 @@ export async function loginUser(req: Request, res: Response) {
     }
 
     try {
-        const user_results = await db.select().from(users).where(eq(users.username, username));
+        const user_results = await db.select().from(usersTable).where(eq(usersTable.username, username));
 
         if (user_results.length === 0 || !user_results[0]) {
             res.status(401).json({ message: "Invalid username" });
@@ -82,7 +82,7 @@ export async function getUser(req: Request, res: Response) {
     }
 
     try {
-        const user_results = await db.select().from(users).where(eq(users.id, parseInt(userId)));
+        const user_results = await db.select().from(usersTable).where(eq(usersTable.id, parseInt(userId)));
 
         if (user_results.length === 0 || !user_results[0]) {
             res.status(404).json({ message: "User not found" });
@@ -111,6 +111,72 @@ export async function refreshToken(req: Request, res: Response) {
         })
 
         res.status(200).json({ token });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+}
+
+export async function deleteUser(req: Request, res: Response) {
+    const userId = req.user?.id;
+    if (!userId) {
+        res.status(400).json({ message: "User ID is required" });
+        return;
+    }
+
+    try {
+        const user_results = await db.select().from(usersTable).where(eq(usersTable.id, parseInt(userId)));
+
+        if (user_results.length === 0 || !user_results[0]) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+        const user = user_results[0];
+        await db.delete(usersTable).where(eq(usersTable.id, parseInt(userId)));
+        res.status(200).json({ message: `User ${user.username} deleted successfully` });
+        return;
+
+    } catch (error: any) {
+        console.error(error);
+        res.status(500).json({ message: `Internal server error: ${error.message}` });
+    }
+}
+
+export async function changePassword(req: Request, res: Response){
+    const userId = req.user?.id;
+    if (!userId) {
+        res.status(400).json({ message: "User ID is required" });
+        return;
+    }
+
+    const { old_password, new_password } = req.body;
+
+    try {
+        const user_results = await db.select().from(usersTable).where(eq(usersTable.id, parseInt(userId)));
+
+        if (user_results.length === 0 || !user_results[0]) {
+            res.status(404).json({ message: "User not found" });
+            return;
+        }
+
+        const user = user_results[0];
+
+        // Verify old password
+        if (!bcrypt.compareSync(old_password, user.password)) {
+            res.status(401).json({ message: "Invalid old password" });
+            return;
+        }
+
+        // Hash new password
+        const hashedNewPassword = bcrypt.hashSync(new_password, 10);
+
+        // Update the user's password in the database
+        await db.update(usersTable)
+            .set({ password: hashedNewPassword })
+            .where(eq(usersTable.id, parseInt(userId)));
+
+        res.status(200).json({ message: "Password changed successfully" });
 
     } catch (error) {
         console.error(error);

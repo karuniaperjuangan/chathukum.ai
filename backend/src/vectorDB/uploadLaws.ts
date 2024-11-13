@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { db } from "../db";
-import { lawUrl, lawData, lawVectordbStatus } from "../db/schema";
+import { lawUrlTable, lawDataTable, lawVectordbStatusTable } from "../db/schema";
 import { chromaVectorStore } from "./chroma";
 import { Document } from "langchain/document";
 const pdfjsLib = require("pdfjs-dist");
@@ -41,7 +41,7 @@ async function extractTextFromPDFUrl(url: string) {
 async function getLawPDFContentbyID(id: string) {
     try {
 
-        const law = await db.select({ title: lawData.title, url: lawUrl.downloadUrl }).from(lawData).leftJoin(lawUrl, (eq(lawData.id, lawUrl.lawId))).where(eq(lawData.id as any, parseInt(id)))
+        const law = await db.select({ title: lawDataTable.title, url: lawUrlTable.downloadUrl }).from(lawDataTable).leftJoin(lawUrlTable, (eq(lawDataTable.id, lawUrlTable.lawId))).where(eq(lawDataTable.id as any, parseInt(id)))
         // Check if the law exists in the database. If not, return an error response.
         if (!law) {
             throw new Error(`Law with ID ${id} not found.`);
@@ -72,13 +72,13 @@ async function getLawPDFContentbyID(id: string) {
 async function uploadLawtoVectorDB(lawTitle: string, lawContent: string, lawId: number) {
     try {
         // If already exist in lawVectorDBStatus, skip the upload process.
-        const lawVectorDBStatus = await db.select().from(lawVectordbStatus).where(and(eq(lawVectordbStatus.lawId, lawId), eq(lawVectordbStatus.hasVectordbRecord, true)))
+        const lawVectorDBStatus = await db.select().from(lawVectordbStatusTable).where(and(eq(lawVectordbStatusTable.lawId, lawId), eq(lawVectordbStatusTable.hasVectordbRecord, true)))
         if (lawVectorDBStatus && lawVectorDBStatus.length > 0) {
             console.log(`Law with ID ${lawId} already exists in the vector database. Skipping upload.`);
-            await db.update(lawVectordbStatus).set({
+            await db.update(lawVectordbStatusTable).set({
                 hasVectordbRecord: true,
                 lastUpdated: new Date().toISOString(),
-            }).where(eq(lawVectordbStatus.lawId, lawId));
+            }).where(eq(lawVectordbStatusTable.lawId, lawId));
             return [];
         }
         const textSplitter = new RecursiveCharacterTextSplitter({
@@ -97,12 +97,12 @@ async function uploadLawtoVectorDB(lawTitle: string, lawContent: string, lawId: 
         })
         // add document to vector store
         const ids = await chromaVectorStore.addDocuments(documents);
-        await db.insert(lawVectordbStatus).values({
+        await db.insert(lawVectordbStatusTable).values({
             lawId: lawId,
             hasVectordbRecord: true,
             lastUpdated: new Date().toISOString(),
         }).onConflictDoUpdate({
-            target: lawVectordbStatus.lawId,
+            target: lawVectordbStatusTable.lawId,
             set: {
                 hasVectordbRecord: true,
                 lastUpdated: new Date().toISOString(),
@@ -119,7 +119,7 @@ async function uploadLawtoVectorDB(lawTitle: string, lawContent: string, lawId: 
 export async function uploadMultipleLaws(lawIds: number[]) {
     let ids: string[] = [];
     //Get list of existing laws in vector database status
-    const existingLaws = await db.select().from(lawVectordbStatus).where(eq(lawVectordbStatus.hasVectordbRecord, true));
+    const existingLaws = await db.select().from(lawVectordbStatusTable).where(eq(lawVectordbStatusTable.hasVectordbRecord, true));
     const existingLawIds = new Set(existingLaws.map(law => law.lawId));
     try {
         for (const id of lawIds) {

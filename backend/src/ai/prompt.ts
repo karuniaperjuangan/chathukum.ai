@@ -12,3 +12,12 @@ export const ragPrompt = ChatPromptTemplate.fromMessages([
   new MessagesPlaceholder("chat_history"),
   ["human", "{question}"],
 ]);
+
+const GENERATE_CHAT_HISTORY_TITLE_TEMPLATE =`
+Dari potongan pertanyaan dan jawaban AI terhadap pertanyaan yang diajukan, buatlah judul topik percakapan.
+Langsung berikan judul topik percakapan dalam maksimal 5 kata. Jangan menyertakan informasi lain selain judul topik percakapan.`
+
+export const generateChatHistoryTitlePrompt = ChatPromptTemplate.fromMessages([
+  ["system", GENERATE_CHAT_HISTORY_TITLE_TEMPLATE],
+  ["human", "{query}"],
+]);

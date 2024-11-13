@@ -61,6 +61,8 @@ router.post("/register", registerUser);
  *             properties:
  *               username:
  *                 type: string
+ *               email:
+ *                 type: string
  *               password:
  *                 type: string
  *             required:

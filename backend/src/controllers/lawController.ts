@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { db } from '../db.ts';
-import { lawData, lawStatus, lawUrl } from '../db/schema.ts';
+import { lawDataTable, lawStatusTable, lawUrlTable } from '../db/schema.ts';
 import { eq, sql, and } from 'drizzle-orm';
 
 
@@ -12,21 +12,21 @@ async function getAllLaws(req: Request, res: Response) {
         const pageSize = Math.min(parseInt(limit as string, 10), 100);
         const offset = (pageNumber - 1) * pageSize;
 
-        let query = db.select().from(lawData).orderBy(lawData.id);
+        let query = db.select().from(lawDataTable).orderBy(lawDataTable.id);
 
         let listConditions = [];
 
         if (type) {
-            listConditions.push(eq(lawData.type as any, type));
+            listConditions.push(eq(lawDataTable.type as any, type));
         }
         if (region) {
-            listConditions.push(eq(lawData.region as any, region));
+            listConditions.push(eq(lawDataTable.region as any, region));
         }
         if (year) {
-            listConditions.push(eq(lawData.year as any, year))
+            listConditions.push(eq(lawDataTable.year as any, year))
         }
         if (category) {
-            listConditions.push(eq(lawData.category as any, category));
+            listConditions.push(eq(lawDataTable.category as any, category));
         }
 
         if (listConditions.length > 0) {
@@ -50,7 +50,7 @@ async function getAllLaws(req: Request, res: Response) {
 async function getLawByID(req: Request, res: Response) {
     const { id } = req.params;
     try {
-        const law = await db.select().from(lawData).where(eq(lawData.id, parseInt(id)));
+        const law = await db.select().from(lawDataTable).where(eq(lawDataTable.id, parseInt(id)));
         if (!law) {
             res.status(404).json({ error: 'Law not found' });
         }
@@ -65,10 +65,10 @@ async function getLawByID(req: Request, res: Response) {
 
 async function getFiltersInformation(req: Request, res: Response) {
     try {
-        const types = await db.selectDistinct({ type: lawData.type }).from(lawData).orderBy(lawData.type)
-        const regions = await db.selectDistinct({ region: lawData.region }).from(lawData).orderBy(lawData.region)
-        const years = await db.selectDistinct({ year: lawData.year }).from(lawData).orderBy(lawData.year)
-        const categories = await db.selectDistinct({ category: lawData.category }).from(lawData).orderBy(lawData.category)
+        const types = await db.selectDistinct({ type: lawDataTable.type }).from(lawDataTable).orderBy(lawDataTable.type)
+        const regions = await db.selectDistinct({ region: lawDataTable.region }).from(lawDataTable).orderBy(lawDataTable.region)
+        const years = await db.selectDistinct({ year: lawDataTable.year }).from(lawDataTable).orderBy(lawDataTable.year)
+        const categories = await db.selectDistinct({ category: lawDataTable.category }).from(lawDataTable).orderBy(lawDataTable.category)
 
         res.status(200).json({
             types: types.map((t: any) => t.type || ''),
