@@ -5,6 +5,15 @@
       "description": "Fake Online REST API for Testing and Prototyping",
       "version": "0.0.1"
     },
+    "components": {
+        "securitySchemes": {
+          "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
+          }
+        }
+      },
     "paths": {
         "/chat":{
             "post":{

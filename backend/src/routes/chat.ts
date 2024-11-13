@@ -223,10 +223,12 @@ router.post("/process-pdf", processLawPDF)
  *                   type: array
  *                   items:
  *                     type: string
+ *                   example: [["human", "Apa bunyi pasal 1 ayat 1 UUD 1945"], ["ai", "Indonesia adalah negara kesatuan yang berbentuk republik"]]
  *               law_ids:
  *                 type: array
  *                 items:
  *                   type: string
+ *                 example: [101646]
  *     responses:
  *       '201':
  *         description: Chat history created successfully
@@ -261,14 +263,14 @@ router.post("/chat-history/new", authenticateToken, newChatHistory)
  *           schema:
  *             type: object
  *             properties:
- *               appended_messages:
+ *               messages:
  *                 type: array
  *                 items:
  *                   type: array
  *                   items:
  *                     type: string
  *               chat_history_id:
- *                 type: string
+ *                 type: integer
  *     responses:
  *       '201':
  *         description: Messages appended successfully
@@ -311,7 +313,7 @@ router.post("/chat-history/update",authenticateToken, appendChatHistory)
  *             type: object
  *             properties:
  *               chat_history_id:
- *                 type: string
+ *                 type: integer
  *     responses:
  *       '200':
  *         description: Chat history retrieved successfully
@@ -347,7 +349,7 @@ router.post("/chat-history/get", authenticateToken, getChatHistory)
  *             type: object
  *             properties:
  *               chat_history_id:
- *                 type: string
+ *                 type: integer
  *     responses:
  *       '200':
  *         description: Chat history and messages deleted successfully

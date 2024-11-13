@@ -20,6 +20,8 @@ const router = Router();
  *             properties:
  *               username:
  *                 type: string
+ *               email:
+ *                 type: string
  *               password:
  *                 type: string
  *             required:
@@ -61,8 +63,6 @@ router.post("/register", registerUser);
  *             properties:
  *               username:
  *                 type: string
- *               email:
- *                 type: string
  *               password:
  *                 type: string
  *             required:
@@ -89,12 +89,12 @@ router.post("/login", loginUser);
 /**
  * @swagger
  * /auth/check:
- *   post:
- *     summary: Refresh the authentication token
+ *   get:
+ *     summary: Test if the user is authenticated
  *     tags:
  *       - Authentication
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       '200':
  *         description: A successful response
@@ -108,13 +108,13 @@ router.get("/check", authenticateToken, (req, res) => {
 
 /**
  * @swagger
- * /auth/refresh-token:
- *   post:
+ * /auth/refresh:
+ *   get:
  *     summary: Refresh the authentication token
  *     tags:
  *       - Authentication
  *     security:
- *       - bearerAuth: []
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: Token successfully refreshed

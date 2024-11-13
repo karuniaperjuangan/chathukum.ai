@@ -6,6 +6,7 @@ import { generateChatHistoryTitle } from '../ai/generateChatHistoryTitle.ts';
 import { db } from '../db.ts';
 import { chatHistoryTable, messagesTable } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
+import { arrayAsString } from 'pdf-lib';
 
 export async function processLawPDF(req: Request, res: Response) {
     const lawIds: string[] = req.body.law_ids;
@@ -119,24 +120,24 @@ export async function newChatHistory(req: Request, res: Response) {
 //route : /chat/chat-history/update (POST)
 export async function appendChatHistory(req: Request, res: Response) {
     try{
-    const {appended_messages, chat_history_id} : {appended_messages: string[][], chat_history_id:string} = req.body;
+    const {messages, chat_history_id} : {messages: string[][], chat_history_id:string} = req.body;
     const chatHistoryId = parseInt(chat_history_id);
     const results = await db.insert(messagesTable).values([
         {
             chatHistoryId,
-            content: appended_messages[-2][1],
+            content: messages[messages.length-2][1],
             message_role: "human",
         },
         {
             chatHistoryId,
-            content: appended_messages[-1][1],
+            content: messages[messages.length-1][1],
             message_role: "ai",
         }
     ])
-    const messages = await db.select().from(messagesTable).where(eq(messagesTable.chatHistoryId, chatHistoryId)).orderBy(messagesTable.id);
+    const newMessages = await db.select().from(messagesTable).where(eq(messagesTable.chatHistoryId, chatHistoryId)).orderBy(messagesTable.id);
     res.status(201).json({
-        chat_history_id,
-        messages
+        "chat_history_id":chat_history_id,
+        "messages":newMessages
     })
     }catch (error: any) {
         console.error(error);
