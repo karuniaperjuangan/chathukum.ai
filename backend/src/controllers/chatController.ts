@@ -35,7 +35,7 @@ export async function retrieveLawContent(req: Request, res: Response) {
             ) // to make sure that at least two laws are returned
         }
         )
-        ).filter(item => item[1] < 0.45) // filter out results with cosine distance greater than 0.45
+        ).filter(item => item[1] < 0.5) // filter out results with cosine distance greater than 0.45
         res.status(200).json(result);
         return;
     } catch (error: any) {
