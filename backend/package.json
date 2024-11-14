@@ -4,6 +4,7 @@
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.0",
     "@types/node": "^22.9.0",
     "@types/pg": "^8.11.10",
@@ -30,6 +31,7 @@
     "@types/swagger-jsdoc": "^6.0.4",
     "bcryptjs": "^2.4.3",
     "chromadb": "^1.9.2",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.36.1",
     "express": "^4.21.1",

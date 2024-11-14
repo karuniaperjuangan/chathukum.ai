@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { db } from '../db.ts';
 import { lawDataTable, lawStatusTable, lawUrlTable } from '../db/schema.ts';
-import { eq, sql, and } from 'drizzle-orm';
+import { eq, sql, and, count } from 'drizzle-orm';
 
 
 async function getAllLaws(req: Request, res: Response) {
@@ -36,9 +36,15 @@ async function getAllLaws(req: Request, res: Response) {
         }
 
         query = query.limit(pageSize).offset(offset) as any;
-
+        let totalCountQuery = db.select({value: count()}).from(lawDataTable)
+        if (listConditions.length > 0) {
+            totalCountQuery = totalCountQuery.where(
+                and(...listConditions)
+            ) as any;
+        }
+        const totalPages = Math.ceil((await totalCountQuery)[0]['value'] / pageSize);
         const laws = await query;
-        res.status(200).json(laws);
+        res.status(200).json({"total_pages":totalPages, "current_page":parseInt(page as string, 10), "data": laws});
         return;
     } catch (error: any) {
         console.error(error);

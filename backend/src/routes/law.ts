@@ -4,6 +4,36 @@ import { getAllLaws, getLawByID, getFiltersInformation } from "../controllers/la
 
 const router = Router();
 
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Law:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: Unique identifier for the law
+ *         title:
+ *           type: string
+ *           description: Title of the law
+ *         description:
+ *           type: string
+ *           description: Description of the law
+ *         type:
+ *           type: string
+ *           description: Type of the law (e.g., civil, criminal)
+ *         region:
+ *           type: string
+ *           description: Region where the law applies
+ *         year:
+ *           type: integer
+ *           description: Year the law was enacted
+ *         category:
+ *           type: string
+ *           description: Category of the law (e.g., family, labor)
+ */
 /**
  * @swagger
  * /laws:
@@ -47,24 +77,22 @@ const router = Router();
  *         description: Filter laws by category
  *     responses:
  *       200:
- *         description: A list of laws
+ *         description: An object containing total pages, current pages, and list of laws in this page
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: integer
- *                   type:
- *                     type: string
- *                   region:
- *                     type: string
- *                   year:
- *                     type: integer
- *                   category:
- *                     type: string
+ *               type: object
+ *               properties:
+ *                 total_pages:
+ *                   type: integer
+ *                   description: Total number of pages
+ *                 current_page:
+ *                   type: integer
+ *                   description: Current page number
+ *                 laws:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Law'
  *       500:
  *         description: Internal server error
  */
