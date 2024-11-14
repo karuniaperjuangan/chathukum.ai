@@ -61,6 +61,11 @@ const router = Router();
  *           type: string
  *         description: Filter laws by type
  *       - in: query
+ *         name: keyword
+ *         schema:
+ *           type: string
+ *         description: Search keyword in title or about
+ *       - in: query
  *         name: region
  *         schema:
  *           type: string

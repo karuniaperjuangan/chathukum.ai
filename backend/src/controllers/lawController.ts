@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
 import { db } from '../db.ts';
 import { lawDataTable, lawStatusTable, lawUrlTable } from '../db/schema.ts';
-import { eq, sql, and, count } from 'drizzle-orm';
+import { eq, sql, and, count, ilike } from 'drizzle-orm';
 
 
 async function getAllLaws(req: Request, res: Response) {
     try {
-        const { page = 1, limit = 100, type, region, year, category } = req.query;
+        const { page="1", limit="100", keyword, type, region, year, category } : { page?: string; limit?: string; keyword?: string; type?: string; region?: string; year?: string; category?: string } = req.query;
 
         const pageNumber = parseInt(page as string, 10);
         const pageSize = Math.min(parseInt(limit as string, 10), 100);
@@ -16,6 +16,9 @@ async function getAllLaws(req: Request, res: Response) {
 
         let listConditions = [];
 
+        if(keyword){
+            listConditions.push(sql`to_tsvector('simple', ${lawDataTable.title} || ' ' || ${lawDataTable.about}) @@ to_tsquery('simple', ${keyword.replace(/ /g,'&')})`)
+        }
         if (type) {
             listConditions.push(eq(lawDataTable.type as any, type));
         }
