@@ -77,7 +77,7 @@ export default function ExploreLawsPage() {
         }
         loadFilters();
 
-    })
+    },[])
     const { data, isLoading, error }: { data: LawResponse | undefined, isLoading: boolean, error: Error | null } = useQuery({
         queryKey: [
             "laws",
