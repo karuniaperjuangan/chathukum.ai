@@ -17,7 +17,7 @@ async function getAllLaws(req: Request, res: Response) {
         let listConditions = [];
 
         if(keyword){
-            listConditions.push(sql`to_tsvector('simple', ${lawDataTable.title} || ' ' || ${lawDataTable.about}) @@ to_tsquery('simple', ${keyword.replace(/ /g,'&')})`)
+            listConditions.push(sql`${lawDataTable.title} || ' ' || ${lawDataTable.about} ilike '%' || ${keyword} || '%'`);
         }
         if (type) {
             listConditions.push(eq(lawDataTable.type as any, type));
@@ -45,9 +45,12 @@ async function getAllLaws(req: Request, res: Response) {
                 and(...listConditions)
             ) as any;
         }
-        const totalPages = Math.ceil((await totalCountQuery)[0]['value'] / pageSize);
+        const totalCount = (await totalCountQuery)[0]['value']
+        const totalPages = Math.ceil(totalCount / pageSize);
         const laws = await query;
-        res.status(200).json({"total_pages":totalPages, "current_page":parseInt(page as string, 10), "data": laws});
+        res.status(200).json({"total_pages":totalPages, 
+            "total_laws":totalCount,
+            "current_page":parseInt(page as string, 10), "data": laws});
         return;
     } catch (error: any) {
         console.error(error);
