@@ -94,12 +94,14 @@ export default function ExploreLawsPage() {
     return (
         <div className="px-12 flex flex-col py-4 bg-ch-almost-white w-screen h-screen">
             <h1 className=" text-2xl font-bold text-center">Eksplorasi Undang-Undang dan Peraturan</h1>
+            
+            <p className=" text-justify py-2">Klik tombol hijau di samping dokumen untuk menambahkan dokumen tersebut. Anda dapat memilih hingga 10 dokumen undang-undang atau peraturan.</p>
             <div className="flex w-full items-center justify-between my-2">
                 <input className="p-2 border rounded-md h-full flex-1"
                     placeholder="Masukkan Kata Kunci..."
                     onChange={(e) => setCurrentKeyword(e.target.value)}></input>
             </div>
-            <div className="flex w-full items-center justify-between space-x-4">
+            <div className="flex h-fit w-full items-center justify-between space-x-4">
                 {/*Dropdown of Types */}
                 <div className="flex justify-center space-x-2 w-full">
                     <select value={currentType} id="type-select" onChange={(e) => setCurrentType(e.target.value)} className="p-2 border rounded-md w-full">
@@ -151,11 +153,11 @@ export default function ExploreLawsPage() {
                 </div>
             </div>
 
-            <div className="grid md:flex flex-1 overflow-y-scroll my-2">
+            <div className="flex max-md:flex-col flex-1 md:overflow-y-hidden my-2">
                 {!isLoading && data &&
-                <div className=" order-2 md:order-1 md:flex-[60%] px-1">
+                <div className=" order-2 md:order-1 md:flex-[60%] px-1 max-md:overflow-y-scroll">
                     <p className="my-2">Jumlah Hukum: {data.total_laws}</p>
-                    <div className="h-full rounded-md py-4">
+                    <div className="rounded-md h-full py-4 px-2 overflow-x-visible">
                         
                         {/*Card of Law */}
                         <div className="space-y-4">
@@ -230,7 +232,7 @@ export default function ExploreLawsPage() {
                     </div>
                  </div>
                 }
-                <div className=" order-1 md:order-2 h-full md:flex-[40%] rounded-md md:p-4 md:overflow-y-scroll">
+                <div className=" order-1 md:order-2 md:flex-[40%] rounded-md md:p-4">
                     
                     <div className="flex space-x-1 align-middle items-center">
                     <p>Undang-Undang yang dipilih</p>
