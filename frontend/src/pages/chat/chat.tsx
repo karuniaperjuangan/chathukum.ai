@@ -26,7 +26,7 @@ export default function ChatbotPage(){
       <div className="min-h-screen flex flex-col bg-gray-100">
         {/* Header */}
         <header className=" bg-ch-coral text-white text-center py-4">
-          <h1 className="text-2xl font-semibold">AI Chatbot</h1>
+          <h1 className="text-2xl font-semibold">ChatHukum.ai</h1>
         </header>
   
         {/* Chat messages */}
@@ -59,7 +59,7 @@ export default function ChatbotPage(){
         <div className="bg-white border-t border-gray-300 p-4">
           <div className="flex items-center space-x-2">
             <textarea
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ch-coral resize-none"
               placeholder="Type your message..."
               rows={1}
               value={input}
@@ -69,7 +69,7 @@ export default function ChatbotPage(){
               onClick={handleSend}
               className="px-4 py-2 bg-ch-coral text-white rounded-lg hover:bg-ch-brick-red"
             >
-              Send
+              Kirim
             </button>
           </div>
         </div>
