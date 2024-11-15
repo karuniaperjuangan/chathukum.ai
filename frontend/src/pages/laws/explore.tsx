@@ -28,10 +28,10 @@ function toTitleCase(str: string) {
 }
 
 function processRegion(region: string) {
-    return toTitleCase(region.replace('kab-', 'kabupaten-').replace('prov','provinsi-')
-    .replace(/-/g, ' ').trim())
-    .replace('Diy','DIY')
-    .replace('Dki','DKI');
+    return toTitleCase(region.replace('kab-', 'kabupaten-').replace('prov', 'provinsi-')
+        .replace(/-/g, ' ').trim())
+        .replace('Diy', 'DIY')
+        .replace('Dki', 'DKI');
 }
 
 export default function ExploreLawsPage() {
@@ -42,6 +42,7 @@ export default function ExploreLawsPage() {
     const [currentKeyword, setCurrentKeyword] = useState<string | undefined>(undefined);
     const [debouncedKeyword] = useDebounce(currentKeyword, 500);
 
+    const [currentSelectedLaws, setCurrentSelectedLaws] = useState<Law[]>([]);
     useEffect(() => {
         setCurrentPage(1); // Reset page when filters change
     }, [currentType, currentRegion, currentCategory, currentKeyword]);
@@ -77,7 +78,7 @@ export default function ExploreLawsPage() {
         }
         loadFilters();
 
-    },[])
+    }, [])
     const { data, isLoading, error }: { data: LawResponse | undefined, isLoading: boolean, error: Error | null } = useQuery({
         queryKey: [
             "laws",
@@ -89,9 +90,9 @@ export default function ExploreLawsPage() {
         ],
         queryFn: fetchLaws,
     });
-
+    console.log(data)
     return (
-        <div className="px-12 flex flex-col py-4 bg-ch-almost-white w-screen h-screen overflow-y-scroll">
+        <div className="px-12 flex flex-col py-4 bg-ch-almost-white w-screen h-screen">
             <h1 className=" text-2xl font-bold text-center">Eksplorasi Undang-Undang dan Peraturan</h1>
             <div className="flex w-full items-center justify-between my-2">
                 <input className="p-2 border rounded-md h-full flex-1"
@@ -149,75 +150,126 @@ export default function ExploreLawsPage() {
                     />
                 </div>
             </div>
-            {!isLoading && data &&
-                <div className="flex-1 overflow-y-auto outline outline-1 rounded-md p-4 my-4">
+
+            <div className="grid md:flex flex-1 overflow-y-scroll my-2">
+                {!isLoading && data &&
+                <div className=" order-2 md:order-1 md:flex-[60%] px-1">
                     <p className="my-2">Jumlah Hukum: {data.total_laws}</p>
-                    {/*Card of Law */}
-                    <div className="space-y-4">
-                        {data.data.map((law) => (
-                            <div key={law.id} className=" bg-white shadow-sm rounded-md min-h-36 w-full shadow-slate-500 p-4 space-y-2">
-                                <p className=" text-gray-600 text-sm">{law.title}</p>
-                                <button className=" text-justify font-bold text-lg text-ch-coral hover:text-ch-brick-red transition-colors" onClick={
-                                    () => window.open("https://peraturan.bpk.go.id" + law.detailUrl, "_blank")
-                                }>{law.about}</button>
-                                <div className="flex space-x-2 flex-wrap">
-                                    <button className="text-xs rounded-md h- max-w-96 px-2 py-1 bg-red-300 hover:bg-red-500 font-medium text-nowrap"
-                                        onClick={() => {
-                                            const typeSelect = document.getElementById('type-select') as HTMLSelectElement;
-                                            if (typeSelect) {
-                                                typeSelect.value = law.type;
-                                                setCurrentType(law.type)
+                    <div className="h-full rounded-md py-4">
+                        
+                        {/*Card of Law */}
+                        <div className="space-y-4">
+                            {data.data.map((law) => (
+                                <div key={law.id} className=" bg-white shadow-md rounded-md min-h-36 w-full shadow-slate-500  p-4 space-y-2 flex align-middle">
 
+                                    <div className="w-4/5 my-auto flex flex-col">
+                                        <p className=" text-gray-600 text-sm">{law.title}</p>
+                                        <button className=" text-justify font-bold text-lg text-ch-coral hover:text-ch-brick-red transition-colors" onClick={
+                                            () => window.open("https://peraturan.bpk.go.id" + law.detailUrl, "_blank")
+                                        }>{law.about}</button>
+                                        <div className="flex flex-wrap">
+                                            <button className="mr-2 my-1 text-xs rounded-md h- max-w-96 px-2 py-1 bg-red-300 hover:bg-red-500 font-medium text-nowrap"
+                                                onClick={() => {
+                                                    const typeSelect = document.getElementById('type-select') as HTMLSelectElement;
+                                                    if (typeSelect) {
+                                                        typeSelect.value = law.type;
+                                                        setCurrentType(law.type)
+
+                                                    }
+                                                }}
+                                            >{(law.type).toUpperCase()}</button>
+                                            <button className="mr-2 my-1 text-xs rounded-md h-8 max-w-96 px-2 py-1 bg-emerald-300 hover:bg-emerald-500 font-medium text-nowrap"
+                                                onClick={() => {
+                                                    const regionInput = document.getElementById("region-input") as HTMLInputElement;
+                                                    if (regionInput) {
+                                                        regionInput.value = law.region;
+                                                        setCurrentRegion(law.region);
+                                                    }
+                                                }}
+                                            >{processRegion(law.region)}</button>
+                                            {law.category&&
+                                            <button className="mr-2 my-1 text-xs rounded-md h-8  max-w-96 px-2 py-1 bg-blue-300 hover:bg-blue-500 font-medium line-clamp-1 text-ellipsis text-nowrap"
+                                                onClick={() => {
+                                                    const categoryInput = document.getElementById("category-input") as HTMLInputElement;
+                                                    if (categoryInput) {
+                                                        categoryInput.value = law.category;
+                                                        setCurrentCategory(law.category);
+                                                    }
+                                                }}
+                                            >{law.category}</button>
                                             }
-                                        }}
-                                    >{(law.type).toUpperCase()}</button>
-                                    <button className="text-xs rounded-md h-8 max-w-96 px-2 py-1 bg-emerald-300 hover:bg-emerald-500 font-medium text-nowrap"
-                                        onClick={() => {
-                                            const regionInput = document.getElementById("region-input") as HTMLInputElement;
-                                            if (regionInput) {
-                                                regionInput.value = law.region;
-                                                setCurrentRegion(law.region);
-                                            }
-                                        }}
-                                    >{processRegion(law.region)}</button>
-                                    <button className="text-xs rounded-md h-8  max-w-96 px-2 py-1 bg-blue-300 hover:bg-blue-500 font-medium line-clamp-1"
-                                        onClick={() => {
-                                            const categoryInput = document.getElementById("category-input") as HTMLInputElement;
-                                            if (categoryInput) {
-                                                categoryInput.value = law.category;
-                                                setCurrentCategory(law.category);
-                                            }
-                                        }}
-                                    >{law.category}</button>
+                                        </div>
+                                    </div>
+                                    <div className="w-full flex flex-1 align-middle justify-center items-center">
+                                        {!currentSelectedLaws.includes(law)?
+                                        <button className=" my-auto bg-emerald-400 hover:bg-emerald-600 max-w-12 rounded-lg aspect-square w-full text-4xl text-ch-almost-white"
+                                            onClick={() => {
+                                                if (currentSelectedLaws.length >= 10) {
+                                                    alert("Hanya dapat menambahkan maksimal 10 undang-undang")
+                                                    return
+                                                }
+                                                setCurrentSelectedLaws(
+                                                    [...currentSelectedLaws, law]
+                                                )
+                                            }}
+                                        >+</button>:
+                                        <button className=" my-auto bg-red-400 hover:bg-red-600 max-w-12 rounded-lg aspect-square w-full text-4xl text-ch-almost-white"
+                                            onClick={() => {
+                                                setCurrentSelectedLaws(
+                                                    currentSelectedLaws.filter(l => l !== law)
+                                                )
+                                            }}
+                                        >-</button>
+                                        }
+
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+
                     </div>
-
-                </div>
-
-
-            }
-            {
-            !isLoading && data &&                    
-             <div className="flex justify-center mt-4">
-                <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-l">{"<<"}</button>
-                <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4">{"<"}</button>
-                {
-                    Array.from({ length: Math.min(data?.total_pages, 5) }, (_, i) => (
-
-                        <button key={currentPage + i - 2} onClick={() => setCurrentPage(currentPage + i - 2)} className={`bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4 ${currentPage === currentPage + i - 2 ? 'bg-blue-500' : ''} ${currentPage + i - 2 <= 0 || currentPage + i - 2 >= data.total_pages ? "hidden" : ""}`}>
-                            {currentPage + i - 2}
-                        </button>
-                    ))
+                 </div>
                 }
-                <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === data?.total_pages} className="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4">{">"}</button>
-                <button onClick={() => setCurrentPage(data?.total_pages)} disabled={currentPage === data?.total_pages} className="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-r">{">>"}</button>
+                <div className=" order-1 md:order-2 h-full md:flex-[40%] rounded-md md:p-4 md:overflow-y-scroll">
+                    
+                    <div className="flex space-x-1 align-middle items-center">
+                    <p>Undang-Undang yang dipilih</p>
+                    <button className=" bg-ch-coral hover:bg-ch-brick-red rounded-md px-2 py-1 text-white"
+                    onClick={()=>{setCurrentSelectedLaws([])}}
+                    >Reset</button>
+                    </div>
+                    <div className=" flex flex-wrap space-y-1">
+                    {currentSelectedLaws.map((law) =>
+                        (<button className="text-xs mr-2 rounded-md min-h-8  max-w-32 px-2 py-1 bg-blue-300 hover:bg-blue-500 font-medium line-clamp-1">{law.title}</button>)
+                    )}
+                    </div>
+                </div>                
             </div>
+            {
+                !isLoading && data &&
+                <div className="flex justify-center mt-4">
+                    <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="bg-slate-300 hover:bg-gray-700 text-black font-bold py-2 px-4 rounded-l">{"<<"}</button>
+                    <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="bg-slate-300 hover:bg-gray-700 text-black font-bold py-2 px-4">{"<"}</button>
+                    {
+                        Array.from({ length: 5 }, (_, i) => (
+
+                            <button key={currentPage + i - 2} onClick={() => setCurrentPage(currentPage + i - 2)} className={` text-black font-bold py-2 px-4 ${i == 2 ? 'bg-blue-300 hover:bg-blue-500' : 'bg-slate-300 hover:bg-gray-700'} ${currentPage + i - 2 <= 0 || currentPage + i - 2 > data.total_pages ? "hidden" : ""}`}>
+                                {currentPage + i - 2}
+                            </button>
+                        ))
+                    }
+                    <button onClick={() => setCurrentPage(currentPage + 1)} disabled={currentPage === data?.total_pages} className="bg-slate-300 hover:bg-gray-700 text-black font-bold py-2 px-4">{">"}</button>
+                    <button onClick={() => setCurrentPage(data?.total_pages)} disabled={currentPage === data?.total_pages} className="bg-slate-300 hover:bg-gray-700 text-black font-bold py-2 px-4 rounded-r">{">>"}</button>
+                </div>
             }
             {
                 isLoading && <div className="w-full h-full">
                     <p>Loading...</p>
+                </div>
+            }
+            {
+                error && <div className="w-full h-full">
+                    <p>Error! {error.message}</p>
                 </div>
             }
 
