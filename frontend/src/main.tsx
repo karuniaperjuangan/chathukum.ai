@@ -7,6 +7,7 @@ import LoginPage from './pages/auth/login.tsx'
 import RegisterPage from './pages/auth/register.tsx'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import ExploreLawsPage from './pages/laws/explore.tsx'
+import ChatbotPage from './pages/chat/chat.tsx'
 
 const router = createBrowserRouter([
   {
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
   {
     path: '/laws',
     element: <ExploreLawsPage/>,
+  },
+  {
+    path: '/chat',
+    element: <ChatbotPage/>,
   },
   {
     path: '*',
