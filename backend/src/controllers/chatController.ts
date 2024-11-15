@@ -97,12 +97,12 @@ export async function newChatHistory(req: Request, res: Response) {
         }).returning();
         const insertedMessages = await db.insert(messagesTable).values([{
             chatHistoryId: insertedChatHistory[0].id,
-            content: messages[0][1],
+            content: messages[0][1], // The question by human
             message_role: "human",
         },
     {
         chatHistoryId: insertedChatHistory[0].id,
-        content: messages[1][1],
+        content: messages[1][1], // The answer by AI
         message_role: "ai",
     }]).returning();
         res.status(201).json({
@@ -125,12 +125,12 @@ export async function appendChatHistory(req: Request, res: Response) {
     const results = await db.insert(messagesTable).values([
         {
             chatHistoryId,
-            content: messages[messages.length-2][1],
+            content: messages[messages.length-2][1], // The second last element is the question by human
             message_role: "human",
         },
         {
             chatHistoryId,
-            content: messages[messages.length-1][1],
+            content: messages[messages.length-1][1], // The last element is the answer by AI
             message_role: "ai",
         }
     ])
