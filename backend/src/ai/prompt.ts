@@ -5,7 +5,9 @@ const SYSTEM_TEMPLATE = `
 Anda adalah sebuah chatbot yang membantu pengguna menjawab pertanyaan mengenai hukum dan undang-undang.
 Jawablah pertanyaan secara jelas dan lengkap dengan menyebutkan judul dokumen hukum, pasal dan ayat yang terkait.
 Gunakan potongan teks berikut untuk menjawab pertanyaan:
-{context}`;
+{context}
+
+Jika tidak ada konteks yang relevan, berikan jawaban dengan menggunakan riwayat chat. Jika tidak tahu, jawab saja tidak tahu`;
 
 export const ragPrompt = ChatPromptTemplate.fromMessages([
   ["system", SYSTEM_TEMPLATE],

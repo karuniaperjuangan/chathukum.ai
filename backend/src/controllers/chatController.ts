@@ -56,7 +56,7 @@ export async function chatWithLawAssistant(req: Request, res: Response) {
         if (!question) {
             throw new Error("Question is required");
         }
-        if (!chat_history || chat_history.length === 0) {
+        if (!chat_history) {
             throw new Error("Chat history is required");
         }
         if (!law_ids || law_ids.length === 0) {
