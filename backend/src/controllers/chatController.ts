@@ -7,6 +7,7 @@ import { db } from '../db.ts';
 import { chatHistoryTable, messagesTable } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
 import { arrayAsString } from 'pdf-lib';
+import type { Message } from '../model/message.tsx';
 
 export async function processLawPDF(req: Request, res: Response) {
     const lawIds: string[] = req.body.law_ids;
@@ -78,9 +79,10 @@ export async function chatWithLawAssistant(req: Request, res: Response) {
     }
 }
 
+
 //route : /chat/chat-history/new (POST)
 export async function newChatHistory(req: Request, res: Response) {
-    const {messages, law_ids} : {messages: string[][], law_ids:string[]} = req.body;
+    const {messages, law_ids} : {messages: Message[], law_ids:string[]} = req.body;
     const lawIds = law_ids.map(id => parseInt(id));
     const title = await generateChatHistoryTitle(messages);
     const userId = parseInt(req.user?.id);
@@ -97,12 +99,12 @@ export async function newChatHistory(req: Request, res: Response) {
         }).returning();
         const insertedMessages = await db.insert(messagesTable).values([{
             chatHistoryId: insertedChatHistory[0].id,
-            content: messages[0][1], // The question by human
+            content: messages[0].content, // The question by human
             message_role: "human",
         },
     {
         chatHistoryId: insertedChatHistory[0].id,
-        content: messages[1][1], // The answer by AI
+        content: messages[1].content, // The answer by AI
         message_role: "ai",
     }]).returning();
         res.status(201).json({
@@ -120,17 +122,17 @@ export async function newChatHistory(req: Request, res: Response) {
 //route : /chat/chat-history/update (POST)
 export async function appendChatHistory(req: Request, res: Response) {
     try{
-    const {messages, chat_history_id} : {messages: string[][], chat_history_id:string} = req.body;
+    const {messages, chat_history_id} : {messages: Message[], chat_history_id:string} = req.body;
     const chatHistoryId = parseInt(chat_history_id);
     const results = await db.insert(messagesTable).values([
         {
             chatHistoryId,
-            content: messages[messages.length-2][1], // The second last element is the question by human
+            content: messages[messages.length-2].content, // The second last element is the question by human
             message_role: "human",
         },
         {
             chatHistoryId,
-            content: messages[messages.length-1][1], // The last element is the answer by AI
+            content: messages[messages.length-1].content, // The last element is the answer by AI
             message_role: "ai",
         }
     ])

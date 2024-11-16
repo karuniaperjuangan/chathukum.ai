@@ -220,10 +220,14 @@ router.post("/process-pdf", processLawPDF)
  *               messages:
  *                 type: array
  *                 items:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: [["human", "Apa bunyi pasal 1 ayat 1 UUD 1945"], ["ai", "Indonesia adalah negara kesatuan yang berbentuk republik"]]
+ *                   type: object
+ *                   properties:
+ *                     role:
+ *                       type: string
+ *                       enum: ["human", "ai"]
+ *                     content:
+ *                       type: string
+ *                 example: [{role: "human", content: "Hello!"}, {role: "ai", content: "Hi there!"}]
  *               law_ids:
  *                 type: array
  *                 items:
@@ -266,9 +270,14 @@ router.post("/chat-history/new", authenticateToken, newChatHistory)
  *               messages:
  *                 type: array
  *                 items:
- *                   type: array
- *                   items:
- *                     type: string
+ *                   type: object
+ *                   properties:
+ *                     role:
+ *                       type: string
+ *                       enum: ["human", "ai"]
+ *                     content:
+ *                       type: string
+ *                 example: [{role: "human", content: "Hello!"}, {role: "ai", content: "Hi there!"}]
  *               chat_history_id:
  *                 type: integer
  *     responses:
