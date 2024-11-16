@@ -82,11 +82,11 @@ export async function chatWithLawAssistant(req: Request, res: Response) {
 
 //route : /chat/chat-history/new (POST)
 export async function newChatHistory(req: Request, res: Response) {
-    const {messages, law_ids} : {messages: Message[], law_ids:string[]} = req.body;
+    const {messages, law_ids} : {messages: any, law_ids:string[]} = req.body;
     const lawIds = law_ids.map(id => parseInt(id));
     const title = await generateChatHistoryTitle(messages);
     const userId = parseInt(req.user?.id);
-
+    console.log(req.body)
     if (!userId) {
         throw new Error("User ID is required");
     }
