@@ -2,23 +2,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce"
-const BASE_URL = "http://localhost:6789"
+import { Law, LawResponse } from "../../model/law";
+import { toast } from "react-toastify";
+const BASE_URL = import.meta.env.VITE_BASE_API_URL
 
-interface Law {
-    id: number;
-    type: string;
-    region: string;
-    title: string;
-    about: string;
-    category: string;
-    detailUrl: string;
-}
-interface LawResponse {
-    total_pages: number;
-    total_laws: number;
-    current_page: number;
-    data: Law[];
-}
+
 
 function toTitleCase(str: string) {
     return str.replace(
@@ -41,6 +29,10 @@ export default function ExploreLawsPage() {
     const [currentCategory, setCurrentCategory] = useState<string | undefined>(undefined);
     const [currentKeyword, setCurrentKeyword] = useState<string | undefined>(undefined);
     const [debouncedKeyword] = useDebounce(currentKeyword, 500);
+    const [types, setTypes] = useState<string[]>([])
+    const [regions, setRegions] = useState<string[]>([])
+    const [categories, setCategories] = useState<string[]>([])
+
 
     const [currentSelectedLaws, setCurrentSelectedLaws] = useState<Law[]>([]);
     useEffect(() => {
@@ -62,9 +54,7 @@ export default function ExploreLawsPage() {
         }
         return response.json();
     };
-    const [types, setTypes] = useState<string[]>([])
-    const [regions, setRegions] = useState<string[]>([])
-    const [categories, setCategories] = useState<string[]>([])
+
     useEffect(() => {
         async function loadFilters() {
             const filterResponse = await fetch(BASE_URL + "/laws/info");
@@ -79,6 +69,32 @@ export default function ExploreLawsPage() {
         loadFilters();
 
     }, [])
+
+    const changeLawType = (law:Law) => {
+        const typeSelect = document.getElementById('type-select') as HTMLSelectElement;
+        if (typeSelect) {
+            typeSelect.value = law.type;
+            setCurrentType(law.type)
+
+        }
+    }
+
+    const changeLawRegion =(law:Law) => {
+        const regionInput = document.getElementById("region-input") as HTMLInputElement;
+        if (regionInput) {
+            regionInput.value = law.region;
+            setCurrentRegion(law.region);
+        }
+    }
+    
+    const changeLawCategory = (law:Law) => {
+        const categoryInput = document.getElementById("category-input") as HTMLInputElement;
+        if (categoryInput) {
+            categoryInput.value = law.category;
+            setCurrentCategory(law.category);
+        }
+    }
+
     const { data, isLoading, error }: { data: LawResponse | undefined, isLoading: boolean, error: Error | null } = useQuery({
         queryKey: [
             "laws",
@@ -92,16 +108,16 @@ export default function ExploreLawsPage() {
     });
     console.log(data)
     return (
-        <div className="px-12 flex flex-col py-4 bg-ch-almost-white w-screen h-screen">
+        <div className="px-12 flex flex-col py-4 bg-ch-almost-white w-screen max-h-screen h-screen">
             <h1 className=" text-2xl font-bold text-center">Eksplorasi Undang-Undang dan Peraturan</h1>
             
-            <p className=" text-justify py-2">Klik tombol hijau di samping dokumen untuk menambahkan dokumen tersebut. Anda dapat memilih hingga 10 dokumen undang-undang atau peraturan.</p>
-            <div className="flex w-full items-center justify-between my-2">
+            <p className=" text-justify  py-2">Klik tombol hijau di samping dokumen untuk menambahkan dokumen tersebut. Anda dapat memilih hingga 10 dokumen undang-undang atau peraturan.</p>
+            <div className="flex w-full items-center justify-between py-2">
                 <input className="p-2 border rounded-md h-full flex-1"
                     placeholder="Masukkan Kata Kunci..."
                     onChange={(e) => setCurrentKeyword(e.target.value)}></input>
             </div>
-            <div className="flex h-fit w-full items-center justify-between space-x-4">
+            <div className="flex w-full items-center justify-between space-x-4">
                 {/*Dropdown of Types */}
                 <div className="flex justify-center space-x-2 w-full">
                     <select value={currentType} id="type-select" onChange={(e) => setCurrentType(e.target.value)} className="p-2 border rounded-md w-full">
@@ -153,14 +169,14 @@ export default function ExploreLawsPage() {
                 </div>
             </div>
 
-            <div className="flex max-md:flex-col flex-1 md:overflow-y-hidden my-2">
+            <div className="flex flex-1 h-full overflow-scroll max-md:flex-col">
                 {!isLoading && data &&
-                <div className=" order-2 md:order-1 md:flex-[60%] px-1 max-md:overflow-y-scroll">
-                    <p className="my-2">Jumlah Hukum: {data.total_laws}</p>
-                    <div className="rounded-md h-full py-4 px-2 overflow-x-visible">
+                <div className="flex flex-1 flex-col order-2 md:order-1 md:flex-[60%] px-1">
+                    <p className="py-2">Jumlah Hukum: {data.total_laws}</p>
+                    <div className="rounded-md flex-1 overflow-y-auto overflow-x-visible">
                         
                         {/*Card of Law */}
-                        <div className="space-y-4">
+                        <div className="space-y-4 px-2 h-full">
                             {data.data.map((law) => (
                                 <div key={law.id} className=" bg-white shadow-md rounded-md min-h-36 w-full shadow-slate-500  p-4 space-y-2 flex align-middle">
 
@@ -171,43 +187,24 @@ export default function ExploreLawsPage() {
                                         }>{law.about}</button>
                                         <div className="flex flex-wrap">
                                             <button className="mr-2 my-1 text-xs rounded-md h- max-w-96 px-2 py-1 bg-red-300 hover:bg-red-500 font-medium text-nowrap"
-                                                onClick={() => {
-                                                    const typeSelect = document.getElementById('type-select') as HTMLSelectElement;
-                                                    if (typeSelect) {
-                                                        typeSelect.value = law.type;
-                                                        setCurrentType(law.type)
-
-                                                    }
-                                                }}
+                                                onClick={()=> changeLawType(law)}
                                             >{(law.type).toUpperCase()}</button>
                                             <button className="mr-2 my-1 text-xs rounded-md h-8 max-w-96 px-2 py-1 bg-emerald-300 hover:bg-emerald-500 font-medium text-nowrap"
-                                                onClick={() => {
-                                                    const regionInput = document.getElementById("region-input") as HTMLInputElement;
-                                                    if (regionInput) {
-                                                        regionInput.value = law.region;
-                                                        setCurrentRegion(law.region);
-                                                    }
-                                                }}
+                                                onClick={()=> changeLawRegion(law)}
                                             >{processRegion(law.region)}</button>
                                             {law.category&&
                                             <button className="mr-2 my-1 text-xs rounded-md h-8  max-w-96 px-2 py-1 bg-blue-300 hover:bg-blue-500 font-medium line-clamp-1 text-ellipsis text-nowrap"
-                                                onClick={() => {
-                                                    const categoryInput = document.getElementById("category-input") as HTMLInputElement;
-                                                    if (categoryInput) {
-                                                        categoryInput.value = law.category;
-                                                        setCurrentCategory(law.category);
-                                                    }
-                                                }}
+                                                onClick={()=>changeLawCategory(law)}
                                             >{law.category}</button>
                                             }
                                         </div>
                                     </div>
                                     <div className="w-full flex flex-1 align-middle justify-center items-center">
-                                        {!currentSelectedLaws.includes(law)?
+                                        {!currentSelectedLaws.some((item)=> item.id == law.id) ?
                                         <button className=" my-auto bg-emerald-400 hover:bg-emerald-600 max-w-12 rounded-lg aspect-square w-full text-4xl text-ch-almost-white"
                                             onClick={() => {
                                                 if (currentSelectedLaws.length >= 10) {
-                                                    alert("Hanya dapat menambahkan maksimal 10 undang-undang")
+                                                    toast.warning("Hanya dapat menambahkan maksimal 10 undang-undang")
                                                     return
                                                 }
                                                 setCurrentSelectedLaws(
@@ -218,7 +215,7 @@ export default function ExploreLawsPage() {
                                         <button className=" my-auto bg-red-400 hover:bg-red-600 max-w-12 rounded-lg aspect-square w-full text-4xl text-ch-almost-white"
                                             onClick={() => {
                                                 setCurrentSelectedLaws(
-                                                    currentSelectedLaws.filter(l => l !== law)
+                                                    currentSelectedLaws.filter(l => law.id !== l.id)
                                                 )
                                             }}
                                         >-</button>
@@ -249,7 +246,7 @@ export default function ExploreLawsPage() {
             </div>
             {
                 !isLoading && data &&
-                <div className="flex justify-center mt-4">
+                <div className="flex justify-center pt-4">
                     <button onClick={() => setCurrentPage(1)} disabled={currentPage === 1} className="bg-slate-300 hover:bg-gray-700 text-black font-bold py-2 px-4 rounded-l">{"<<"}</button>
                     <button onClick={() => setCurrentPage(currentPage - 1)} disabled={currentPage === 1} className="bg-slate-300 hover:bg-gray-700 text-black font-bold py-2 px-4">{"<"}</button>
                     {
