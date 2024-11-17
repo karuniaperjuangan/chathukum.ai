@@ -3,7 +3,7 @@ import { Message } from "../../model/messages";
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
 import Markdown from "react-markdown";
 import Skeleton from "react-loading-skeleton";
-import { HiOutlinePencilAlt, HiTrash } from "react-icons/hi";
+import { HiDocumentAdd, HiOutlinePencilAlt, HiTrash } from "react-icons/hi";
 import { FiSettings } from "react-icons/fi";
 import { ChatHistory } from "../../model/chatHistory";
 import { toast } from "react-toastify";
@@ -37,9 +37,20 @@ export default function ChatbotPage(){
         body:JSON.stringify({chat_history_id:history.id})
       })
       .then(response => response.json())
-      .then(data => {
+      .then(async (data) => {
         setMessages(data.messages.map((msg:any)=>({"role":msg.message_role,"content":msg.content})))
         setCurrentHistoryId(history.id)
+          try{
+          const response = await (await fetch(import.meta.env.VITE_BASE_API_URL+"/laws?"
+            +new URLSearchParams({
+              "law_ids":data.lawIds	.join(",")
+            }),{
+            method:"GET",
+            })).json()
+            setCurrentSelectedLaws(response.data)            
+          }catch(error:any){
+            toast.error("Failed to load laws data. You may need to select laws again"+error.message)
+          }
       })
     }
 
@@ -103,6 +114,7 @@ export default function ChatbotPage(){
 
     const handleClickNewMessage =() => {
       setCurrentHistoryId(undefined);
+      setCurrentSelectedLaws([])
       setMessages([])
     }
     const [chatHistories, setChatHistories] = useState<ChatHistory[]>([])
@@ -141,7 +153,6 @@ export default function ChatbotPage(){
         }} catch(error:any){
           throw error;
         } finally{
-          console.log(messages)
           
         }
 
@@ -167,8 +178,9 @@ export default function ChatbotPage(){
         }
       )
       .then((response) => response.json())
-      .then((data) => {
-        setChatHistories(data.map((history:ChatHistory) => history))
+      .then((data:ChatHistory[]) => {
+        //reverse data order
+        setChatHistories(data.map((history:ChatHistory) => history).reverse())
       }
       )
     }
@@ -180,6 +192,7 @@ export default function ChatbotPage(){
       }
       else{
         reloadChatHistories().then(()=>{});
+        handleClickNewMessage();
       }
     },[])
   
@@ -190,14 +203,14 @@ export default function ChatbotPage(){
         <Dialog open={isSelectLawsDialogOpen} onClose={()=>setIsSelectLawsDialogOpen(false)} className="relative z-50">
       <div className="fixed inset-0 flex items-center justify-center p-12 h-screen w-screen">
         <DialogPanel className="h-full rounded-lg outline outline-1 shadow-2xl shadow-gray-600 bg-ch-almost-white">
-          <ChooseLawsComponent/>
+          <ChooseLawsComponent setIsSelectLawsDialogOpen={setIsSelectLawsDialogOpen} isSelectLawsDialogOpen={isSelectLawsDialogOpen}/>
         </DialogPanel>
       </div>
     </Dialog>
       <div
         className={`${
-          isSidebarOpen ? "left-0" : "-left-64"
-        } w-64 fixed bg-ch-coral z-10 shadow-md shadow-black text-white flex h-screen flex-col transition-all duration-300`}
+          isSidebarOpen ? "left-0" : "fixed -left-64"
+        } w-64 bg-ch-coral z-10 shadow-md shadow-black text-white flex h-screen flex-col transition-all duration-300`}
       >
         {/* Toggle Button */}
         <button
@@ -211,7 +224,7 @@ export default function ChatbotPage(){
         <div className="flex-1 px-4 overflow-y-scroll">
           <p className="p-2 text-justify">Daftar Riwayat Chat</p>
           {chatHistories.map((history, index) => (
-            <div className="rounded-md w-full flex ">
+            <div className="rounded-md w-full flex " key={index}>
             <button
               key={index}
               className={`p-2 cursor-pointer text-justify text-sm flex-1 hover:bg-ch-brick-red rounded-md transition-all`}
@@ -252,6 +265,8 @@ export default function ChatbotPage(){
   
         {/* Chat messages */}
         <div className="flex-1 p-4 overflow-y-auto">
+          {(currentSelectedLaws.length>0 && (messages.length>0 || isLoading)) ?
+
           <div className="space-y-4">
             {messages.map((message, index) => (
               <div
@@ -281,13 +296,24 @@ export default function ChatbotPage(){
               </div>
             }
           </div>
+          :
+          <div className='flex w-full h-full flex-col justify-center items-center'>
+            <p className="text-gray-800 text-center max-w-md text-xl">Selamat datang di ChatHukum.ai! Anda dapat bertanya hal apapun terkait 250.000+ dokumen peraturan perundang-undangan yang ada di Indonesia.</p>
+            {(currentSelectedLaws.length && !messages.length )? <p className="text-gray-800 text-center max-w-md text-xl mt-4">Tulis pesan di bawah untuk memulai obrolan.</p>:<></>}
+            {!currentSelectedLaws.length && <p className="text-gray-800 text-center max-w-md text-xl mt-4">Sebelum memulai, pilihlah terlebih dahulu dokumen peraturan atau undang-undang yang akan ditanyakan.</p>}            
+            {!currentSelectedLaws.length && <button className="flex bg-ch-coral hover:bg-ch-brick-red py-2 px-4 rounded-md mt-4" onClick={() => setIsSelectLawsDialogOpen(true)}>
+              <HiDocumentAdd size={25} className='mr-2 text-white'/>
+              <p className="text-white">Pilih Dokumen</p>
+            </button>}
+          </div>
+        }
         </div>
   
         {/* Input bar */}
         <div className="bg-white border-t border-gray-300 p-4">
           <div className="flex items-center space-x-2">
             <textarea
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ch-coral resize-none"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ch-coral resize-none disabled:bg-gray-300"
               placeholder="Tuliskan pertanyaan Anda..."
               rows={1}
               value={input}
@@ -299,10 +325,11 @@ export default function ChatbotPage(){
                 }
               }}
               onChange={(e) => setInput(e.target.value)}
+              disabled={isLoading || currentSelectedLaws.length===0}
             />
             <button
               onClick={handleSend}
-              className="px-4 py-2 bg-ch-coral text-white rounded-lg hover:bg-ch-brick-red disabled:bg-gray-300 transition-all"
+              className="px-4 py-2 bg-ch-coral text-white rounded-lg hover:bg-ch-brick-red disabled:bg-gray-300 disabled:text-gray-400 transition-all"
               disabled={isLoading || input.trim() === '' || currentSelectedLaws.length===0}
             >
               Kirim

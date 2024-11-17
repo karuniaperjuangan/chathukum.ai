@@ -23,7 +23,7 @@ function processRegion(region: string) {
         .replace('Dki', 'DKI');
 }
 
-export default function ChooseLawsComponent() {
+export default function ChooseLawsComponent({isSelectLawsDialogOpen=true,setIsSelectLawsDialogOpen =()=>{}}: {isSelectLawsDialogOpen:boolean,setIsSelectLawsDialogOpen:(open:boolean)=>void}) {
     const [currentPage, setCurrentPage] = useState(1);
     const [currentType, setCurrentType] = useState<string | undefined>(undefined);
     const [currentRegion, setCurrentRegion] = useState<string | undefined>(undefined);
@@ -43,8 +43,13 @@ export default function ChooseLawsComponent() {
     }, [currentType, currentRegion, currentCategory, currentKeyword]);
 
     const handleSaveClick = ()=>{
+        if(currentSelectedTempLaws.length ===0){
+            toast.warning('Belum ada dokumen yang dipilih')
+            return;
+        }
         setCurrentSelectedLaws(currentSelectedTempLaws)
         toast.success('Berhasil disimpan')
+        setIsSelectLawsDialogOpen(false)
     }
 
     const fetchLaws = async () => {
@@ -113,12 +118,11 @@ export default function ChooseLawsComponent() {
         ],
         queryFn: fetchLaws,
     });
-    console.log(data)
     return (
-        <div className="h-full px-12 flex flex-col py-4">
+        <div className="h-full w-full px-12 flex flex-col py-4">
             <h1 className=" text-2xl font-bold text-center">Edit Daftar Dokumen Undang-Undang dan Peraturan</h1>
             
-            <p className=" text-justify  py-2">Klik tombol hijau di samping dokumen untuk menambahkan dokumen tersebut. Anda dapat memilih hingga 10 dokumen undang-undang atau peraturan.</p>
+            <p className=" text-justify  py-2">Klik tombol hijau di samping sebuah dokumen untuk menambahkan dokumen tersebut ke dalam daftar dokumen yang digunakan AI untuk menjawab pertanyaan. Anda dapat memilih hingga 10 dokumen undang-undang atau peraturan.</p>
             <div className="flex w-full items-center justify-between py-2">
                 <input className="p-2 border rounded-md h-full flex-1"
                     placeholder="Masukkan Kata Kunci..."
@@ -270,17 +274,17 @@ export default function ChooseLawsComponent() {
             }
             {
                 isLoading && <div className="w-full h-full flex items-center align-middle">
-                    <p>Loading...</p>
+                    <p className=" text-center mx-auto text-2xl">Loading...</p>
                 </div>
             }
             {
                 error && <div className="w-full h-full flex items-center align-middle">
-                    <p>Error! {error.message}</p>
+                    <p className=" text-center mx-auto text-2xl">Error! {error.message}</p>
                 </div>
             }
 
             <div className="flex w-full justify-around my-4 text-white">
-            <div/>
+            <button className=" bg-red-500  w-24 hover:bg-red-700 font-bold px-4 py-2 rounded-md" onClick={() => setIsSelectLawsDialogOpen(false)}>Batal</button>
             <button className=" bg-emerald-500  w-24 hover:bg-emerald-700 font-bold px-4 py-2 rounded-md" onClick={handleSaveClick}>Simpan</button>
             </div>
         </div>
