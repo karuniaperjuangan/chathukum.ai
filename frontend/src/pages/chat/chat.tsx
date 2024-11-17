@@ -276,7 +276,7 @@ export default function ChatbotPage(){
                 }`}
               >
                 <div
-                  className={`max-w-xs flex px-4 py-2 rounded-lg  text-wrap ${
+                  className={`max-w-lg flex px-4 py-2 rounded-lg  text-wrap ${
                     message.role === "human"
                       ? " bg-ch-soft-red text-white"
                       : "bg-gray-300 text-black"
