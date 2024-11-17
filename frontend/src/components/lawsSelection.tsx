@@ -23,7 +23,7 @@ function processRegion(region: string) {
         .replace('Dki', 'DKI');
 }
 
-export default function ChooseLawsComponent({isSelectLawsDialogOpen=true,setIsSelectLawsDialogOpen =()=>{}}: {isSelectLawsDialogOpen:boolean,setIsSelectLawsDialogOpen:(open:boolean)=>void}) {
+export default function ChooseLawsComponent({setIsSelectLawsDialogOpen =()=>{}}: {isSelectLawsDialogOpen:boolean,setIsSelectLawsDialogOpen:(open:boolean)=>void}) {
     const [currentPage, setCurrentPage] = useState(1);
     const [currentType, setCurrentType] = useState<string | undefined>(undefined);
     const [currentRegion, setCurrentRegion] = useState<string | undefined>(undefined);

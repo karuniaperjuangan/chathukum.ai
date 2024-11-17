@@ -7,7 +7,7 @@ import { HiDocumentAdd, HiOutlinePencilAlt, HiTrash } from "react-icons/hi";
 import { FiSettings } from "react-icons/fi";
 import { ChatHistory } from "../../model/chatHistory";
 import { toast } from "react-toastify";
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import ChooseLawsComponent from "../../components/lawsSelection";
 import { SelectedLawsContext } from "../../context/context";
 

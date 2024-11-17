@@ -9,5 +9,5 @@ export default {
       version: '1.0.0',
     },
   },
-  apis: ['../**/*.ts'], // files containing annotations as above
+  apis: ['**/*.ts'], // files containing annotations as above
 };
