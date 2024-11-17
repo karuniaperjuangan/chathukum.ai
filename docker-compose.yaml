@@ -17,6 +17,23 @@ services:
       - 8000:8000
     volumes:
       - chroma-data:/chroma/chroma
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports: 
+      - 6789:6789
+    depends_on:
+      - postgres
+      - chroma
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - backend
 
 
 volumes:
