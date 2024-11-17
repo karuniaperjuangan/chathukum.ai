@@ -33,7 +33,7 @@ const router = Router();
  *         category:
  *           type: string
  *           description: Category of the law (e.g., family, labor)
- */
+*/
 /**
  * @swagger
  * /laws:
@@ -80,6 +80,11 @@ const router = Router();
  *         schema:
  *           type: string
  *         description: Filter laws by category
+ *       - in: query
+ *         name: law_ids
+ *         schema:
+ *           type: string
+ *         description: Filter laws by law_ids
  *     responses:
  *       200:
  *         description: An object containing total pages, current pages, and list of laws in this page

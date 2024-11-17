@@ -20,7 +20,6 @@ export async function getAnswerFromRAG(input: ChatbotInput) {
             "$or": (input.lawIds.map(id => ({ lawId: id }))
                 .concat([{ lawId: input.lawIds[0] }])) // to make sure that at least two laws are returned
         })).map(item => `Judul:${item[0].metadata['title']}\nIsi:\n${item[0].pageContent}`)).join('\n\n') || 'Tidak ada hasil yang relevan.';
-        console.log(result);
         const chain = RunnableSequence.from([
             RunnablePassthrough.assign({
                 context: () => result

@@ -85,7 +85,6 @@ export async function newChatHistory(req: Request, res: Response) {
     const lawIds = law_ids.map(id => parseInt(id));
     const title = await generateChatHistoryTitle(messages);
     const userId = parseInt(req.user?.id);
-    console.log(req.body)
     if (!userId) {
         throw new Error("User ID is required");
     }

@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
 import { db } from '../db.ts';
 import { lawDataTable, lawStatusTable, lawUrlTable } from '../db/schema.ts';
-import { eq, sql, and, count, ilike } from 'drizzle-orm';
+import { eq, sql, and, count, ilike, inArray } from 'drizzle-orm';
 
 
 async function getAllLaws(req: Request, res: Response) {
     try {
-        const { page="1", limit="100", keyword, type, region, year, category } : { page?: string; limit?: string; keyword?: string; type?: string; region?: string; year?: string; category?: string } = req.query;
+        const { page="1", limit="100", keyword, type, region, year, category, law_ids } : { page?: string; limit?: string; keyword?: string; type?: string; region?: string; year?: string; category?: string, law_ids?:string } = req.query;
 
         const pageNumber = parseInt(page as string, 10);
         const pageSize = Math.min(parseInt(limit as string, 10), 100);
@@ -30,6 +30,10 @@ async function getAllLaws(req: Request, res: Response) {
         }
         if (category) {
             listConditions.push(eq(lawDataTable.category as any, category));
+        }
+        if(law_ids){
+        const lawIdsArray = law_ids.matchAll(/(\d+)/g).map(match => parseInt(match[1], 10)).toArray(); // Extract numbers from the string            
+            listConditions.push(inArray(lawDataTable.id,lawIdsArray))
         }
 
         if (listConditions.length > 0) {

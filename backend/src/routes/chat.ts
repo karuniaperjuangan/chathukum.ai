@@ -280,6 +280,11 @@ router.post("/chat-history/new", authenticateToken, newChatHistory)
  *                 example: [{role: "human", content: "Hello!"}, {role: "ai", content: "Hi there!"}]
  *               chat_history_id:
  *                 type: integer
+ *               law_ids:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: [101646]
  *     responses:
  *       '201':
  *         description: Messages appended successfully

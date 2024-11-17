@@ -15,7 +15,6 @@ declare global {
 export const authenticateToken = (req:Request,res:Response,next:NextFunction)=>{
     try{
     const authHeader = req.headers.authorization;
-    console.log(authHeader);
     const token = authHeader && authHeader.split(' ')[1];
     if(token == null){
         res.sendStatus(401);

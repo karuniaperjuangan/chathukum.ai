@@ -12,7 +12,6 @@ async function extractTextFromPDFUrl(url: string) {
     try {
         const response = await fetch(url);
         const buffer = await response.arrayBuffer()
-        console.log("Buffer received");
 
         let text = '';
 
@@ -74,7 +73,6 @@ async function uploadLawtoVectorDB(lawTitle: string, lawContent: string, lawId: 
         // If already exist in lawVectorDBStatus, skip the upload process.
         const lawVectorDBStatus = await db.select().from(lawVectordbStatusTable).where(and(eq(lawVectordbStatusTable.lawId, lawId), eq(lawVectordbStatusTable.hasVectordbRecord, true)))
         if (lawVectorDBStatus && lawVectorDBStatus.length > 0) {
-            console.log(`Law with ID ${lawId} already exists in the vector database. Skipping upload.`);
             await db.update(lawVectordbStatusTable).set({
                 hasVectordbRecord: true,
                 lastUpdated: new Date().toISOString(),
