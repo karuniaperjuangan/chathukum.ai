@@ -6,7 +6,6 @@ import { generateChatHistoryTitle } from '../ai/generateChatHistoryTitle.ts';
 import { db } from '../db.ts';
 import { chatHistoryTable, messagesTable } from '../db/schema.ts';
 import { eq } from 'drizzle-orm';
-import { arrayAsString } from 'pdf-lib';
 import type { Message } from '../model/message.tsx';
 
 export async function processLawPDF(req: Request, res: Response) {
@@ -122,7 +121,11 @@ export async function newChatHistory(req: Request, res: Response) {
 //route : /chat/chat-history/update (POST)
 export async function appendChatHistory(req: Request, res: Response) {
     try{
-    const {messages, chat_history_id} : {messages: Message[], chat_history_id:string} = req.body;
+    const {messages, chat_history_id, law_ids} : {messages: Message[], chat_history_id:string, law_ids:string[]|undefined} = req.body;
+    if (law_ids){
+        const lawIds = law_ids.map(id => parseInt(id));   
+        await db.update(chatHistoryTable).set({lawIds: lawIds}).where(eq(chatHistoryTable.id, parseInt(chat_history_id))) 
+    }
     const chatHistoryId = parseInt(chat_history_id);
     const results = await db.insert(messagesTable).values([
         {

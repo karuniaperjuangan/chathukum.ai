@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Message } from "../../model/messages";
 import { GoSidebarCollapse, GoSidebarExpand } from "react-icons/go";
-import { IoChatbox, IoChatboxOutline, IoRefreshCircle } from "react-icons/io5";
 import Markdown from "react-markdown";
 import Skeleton from "react-loading-skeleton";
-import { HiOutlinePencil, HiOutlinePencilAlt } from "react-icons/hi";
+import { HiOutlinePencilAlt, HiTrash } from "react-icons/hi";
 import { FiSettings } from "react-icons/fi";
 import { ChatHistory } from "../../model/chatHistory";
 import { toast } from "react-toastify";
+import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import ChooseLawsComponent from "../../components/lawsSelection";
+import { SelectedLawsContext } from "../../context/context";
 
 export default function ChatbotPage(){
 
@@ -15,9 +17,9 @@ export default function ChatbotPage(){
     const [input, setInput] = useState("");
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [currentSelectedLawIds, setCurrentSelectedLawsIds] = useState<number[]>([101646]);
+    const { currentSelectedLaws, setCurrentSelectedLaws } = useContext(SelectedLawsContext)
     const [currentChatHistoryId, setCurrentHistoryId] = useState<number|undefined>()
-
+    const [isSelectLawsDialogOpen,setIsSelectLawsDialogOpen] = useState(false)
     const[isMenuOpen,setIsMenuOpen] =useState(false);
 
     const toggleSidebar = () => {
@@ -41,6 +43,25 @@ export default function ChatbotPage(){
       })
     }
 
+    const handleDeleteChatHistory = async (history: ChatHistory) => {
+      fetch(import.meta.env.VITE_BASE_API_URL+"/chat/chat-history/delete",{
+        method:"DELETE",
+        headers:{
+          'Authorization': 'Bearer '+localStorage.getItem('token'),
+          'Content-Type': 'application/json',
+        },
+        body:JSON.stringify({chat_history_id:history.id})}).then(async (response)=>{
+          if(response.ok){
+            toast.success("Berhasil menghapus riwayat chat")
+            await reloadChatHistories()
+          } else{
+            toast.error("Gagal menghapus riwayat chat")
+          }
+        }).catch((error:any)=>{
+          toast.error("Terjadi kesalahan saat menghapus riwayat chat:",error.message)
+        })
+    }
+
     const updateChatHistoryinDatabase = async(msgs:Message[])=>{
       if(!currentChatHistoryId){
         fetch(import.meta.env.VITE_BASE_API_URL+"/chat/chat-history/new",{
@@ -49,7 +70,7 @@ export default function ChatbotPage(){
             'Authorization': 'Bearer '+localStorage.getItem('token'),
             'Content-Type': 'application/json',
         },
-        body:JSON.stringify({"messages":msgs,"law_ids":currentSelectedLawIds})
+        body:JSON.stringify({"messages":msgs,"law_ids":currentSelectedLaws.map(law=>law.id)})
       }).then(async (response)=>{
         if(response.ok){
         toast.success("Chat berhasil ditambahkan")
@@ -102,7 +123,7 @@ export default function ChatbotPage(){
             method: "POST",
             body: JSON.stringify({
               question: humanMessage.content,
-              law_ids: currentSelectedLawIds,
+              law_ids: currentSelectedLaws.map(law=>law.id),
               chat_history: messages[messages.length-1]??[]
             }),
             headers: {
@@ -163,44 +184,53 @@ export default function ChatbotPage(){
     },[])
   
     return (
-      <div className="h-screen flex bg-gray-100">
+      
+      <div className="h-screen flex overflow-y-scroll bg-gray-100">
         {/* Sidebar */}
+        <Dialog open={isSelectLawsDialogOpen} onClose={()=>setIsSelectLawsDialogOpen(false)} className="relative z-50">
+      <div className="fixed inset-0 flex items-center justify-center p-12 h-screen w-screen">
+        <DialogPanel className="h-full rounded-lg outline outline-1 shadow-2xl shadow-gray-600 bg-ch-almost-white">
+          <ChooseLawsComponent/>
+        </DialogPanel>
+      </div>
+    </Dialog>
       <div
         className={`${
-          isSidebarOpen ? "w-64" : "w-0"
-        } bg-ch-coral z-10 shadow-md shadow-black text-white flex h-screen flex-col transition-all duration-300`}
+          isSidebarOpen ? "left-0" : "-left-64"
+        } w-64 fixed bg-ch-coral z-10 shadow-md shadow-black text-white flex h-screen flex-col transition-all duration-300`}
       >
-        <div className={`${!isSidebarOpen ? 'hidden':''}`}>
         {/* Toggle Button */}
         <button
-          className={`px-4 hover:bg-ch-brick-red h-16 ${!isSidebarOpen && 'hidden'}`}
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className={`px-4 hover:bg-ch-brick-red w-full h-16`}
+          onClick={toggleSidebar}
         >
           {!isSidebarOpen ? <GoSidebarCollapse size={25}/> : <GoSidebarExpand size={25}/>}
         </button>
 
         {/* Chat History */}
-        <div className="flex-1 overflow-y-scroll">
+        <div className="flex-1 px-4 overflow-y-scroll">
           <p className="p-2 text-justify">Daftar Riwayat Chat</p>
           {chatHistories.map((history, index) => (
+            <div className="rounded-md w-full flex ">
             <button
               key={index}
-              className={`p-2 w-full hover:bg-ch-brick-red cursor-pointer text-justify ${
-                isSidebarOpen ? "text-base" : "text-base"
-              }`}
+              className={`p-2 cursor-pointer text-justify text-sm flex-1 hover:bg-ch-brick-red rounded-md transition-all`}
               title={history.title}
               onClick={()=>handleChatHistoryClick(history)}
             >
               {history.title}
             </button>
+            <button className="p-2  hover:bg-ch-brick-red rounded-md transition-all" onClick={() => handleDeleteChatHistory(history)}>
+              <HiTrash size={25}/>
+            </button>
+            </div>
           ))}
         </div>
-      </div>
       </div>
         <div className="flex flex-col flex-1 h-screen">
         {/* Header */}
         <header className=" bg-ch-coral h-16 px-4 text-white text-center flex">
-          {!isSidebarOpen &&<button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+          {<button onClick={toggleSidebar}>
             <GoSidebarCollapse size={25} />
           </button>  }
           <div className="flex-1"/>
@@ -216,7 +246,7 @@ export default function ChatbotPage(){
           </div>
         </header>
         <div id="menu" className={`fixed right-0 top-16 bg-ch-coral rounded-b-md text-left text-white shadow-md w-64 z-10 ${isMenuOpen?'':'hidden'}`}>
-          <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="w-full px-4 text-left transition-all hover:bg-ch-brick-red  py-2">Edit Daftar Dokumen</button>
+          <button onClick={()=> setIsSelectLawsDialogOpen(true)} className="w-full px-4 text-left transition-all hover:bg-ch-brick-red  py-2">Edit Daftar Dokumen</button>
           <button onClick={handleLogout} className="w-full px-4 text-left transition-all hover:bg-ch-brick-red py-2">Keluar</button>
         </div>
   
@@ -258,7 +288,7 @@ export default function ChatbotPage(){
           <div className="flex items-center space-x-2">
             <textarea
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-ch-coral resize-none"
-              placeholder="Type your message..."
+              placeholder="Tuliskan pertanyaan Anda..."
               rows={1}
               value={input}
               onKeyDown={async(e) => {
@@ -273,7 +303,7 @@ export default function ChatbotPage(){
             <button
               onClick={handleSend}
               className="px-4 py-2 bg-ch-coral text-white rounded-lg hover:bg-ch-brick-red disabled:bg-gray-300 transition-all"
-              disabled={isLoading || input.trim() === ''}
+              disabled={isLoading || input.trim() === '' || currentSelectedLaws.length===0}
             >
               Kirim
             </button>
