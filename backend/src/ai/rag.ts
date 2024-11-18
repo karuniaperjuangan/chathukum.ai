@@ -17,8 +17,7 @@ export async function getAnswerFromRAG(input: ChatbotInput) {
 
         // Initialize a retriever wrapper around the vector store
         const result = ((await postgresVectorStore.similaritySearchWithScore(input.question, 10, {
-            "$or": (input.lawIds.map(id => ({ lawId: id }))
-                .concat([{ lawId: input.lawIds[0] }])) // to make sure that at least two laws are returned
+            "lawId": {"in":input.lawIds.concat([input.lawIds[0]])} 
         })).map(item => `Judul:${item[0].metadata['title']}\nIsi:\n${item[0].pageContent}`)).join('\n\n') || 'Tidak ada hasil yang relevan.';
         const chain = RunnableSequence.from([
             RunnablePassthrough.assign({
