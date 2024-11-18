@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { Law, LawResponse } from "../model/law";
-import { toast } from "react-toastify";
-import { SelectedLawsContext } from "../context/context";
+
 const BASE_URL = import.meta.env.VITE_BASE_API_URL;
 
 function toTitleCase(str: string) {
@@ -25,12 +24,7 @@ function processRegion(region: string) {
     .replace("Dki", "DKI");
 }
 
-export default function ChooseLawsComponent({
-  setIsSelectLawsDialogOpen = () => {},
-}: {
-  isSelectLawsDialogOpen: boolean;
-  setIsSelectLawsDialogOpen: (open: boolean) => void;
-}) {
+export default function ExploreLawsComponent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [currentType, setCurrentType] = useState<string | undefined>(undefined);
   const [currentRegion, setCurrentRegion] = useState<string | undefined>(
@@ -47,23 +41,9 @@ export default function ChooseLawsComponent({
   const [regions, setRegions] = useState<string[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
 
-  const { currentSelectedLaws, setCurrentSelectedLaws } =
-    useContext(SelectedLawsContext);
-  const [currentSelectedTempLaws, setCurrentTempSelectedLaws] =
-    useState<Law[]>(currentSelectedLaws);
   useEffect(() => {
     setCurrentPage(1); // Reset page when filters change
   }, [currentType, currentRegion, currentCategory, currentKeyword]);
-
-  const handleSaveClick = () => {
-    if (currentSelectedTempLaws.length === 0) {
-      toast.warning("Belum ada dokumen yang dipilih");
-      return;
-    }
-    setCurrentSelectedLaws(currentSelectedTempLaws);
-    toast.success("Berhasil disimpan");
-    setIsSelectLawsDialogOpen(false);
-  };
 
   const fetchLaws = async () => {
     const response = await fetch(
@@ -150,14 +130,11 @@ export default function ChooseLawsComponent({
   return (
     <div className="h-full w-full px-12 flex flex-col py-4">
       <h1 className=" text-2xl font-bold text-center">
-        Edit Daftar Dokumen Undang-Undang dan Peraturan
+        Daftar Dokumen Undang-Undang dan Peraturan
       </h1>
 
       <p className=" text-justify  py-2">
-        Klik tombol hijau di samping sebuah dokumen untuk menambahkan dokumen
-        tersebut ke dalam daftar dokumen yang digunakan AI untuk menjawab
-        pertanyaan. Anda dapat memilih hingga 10 dokumen undang-undang atau
-        peraturan.
+        Ini adalah undang-undang dan peraturan yang tersedia dalam database kami
       </p>
       <div className="flex w-full items-center justify-between py-2">
         <input
@@ -238,16 +215,16 @@ export default function ChooseLawsComponent({
             <p className="py-2">Jumlah Hukum: {data.total_laws}</p>
             <div className="rounded-md flex-1 overflow-y-auto overflow-x-visible">
               {/*Card of Law */}
-              <div className="space-y-4 px-2 h-full">
+              <div className="px-2 gap-y-4 lg:grid lg:grid-cols-2 lg:gap-x-2 h-full mx-auto">
                 {data.data.map((law) => (
                   <div
                     key={law.id}
-                    className=" bg-white shadow-md rounded-md min-h-36 w-full shadow-slate-500  p-4 space-y-2 flex align-middle"
+                    className=" bg-white max-lg:my-4 shadow-md rounded-md min-h-36 w-full shadow-slate-500  p-4 flex align-middle"
                   >
-                    <div className="w-4/5 my-auto flex flex-col">
+                    <div className="h-full w-4/5 my-auto flex flex-col">
                       <p className=" text-gray-600 text-sm">{law.title}</p>
                       <button
-                        className=" text-justify font-bold text-lg text-ch-coral hover:text-ch-brick-red transition-colors line-clamp-3 text-wrap"
+                        className="flex-1 text-justify font-bold text-lg overflow-y-scroll text-ch-coral hover:text-ch-brick-red transition-colors"
                         onClick={() =>
                           window.open(
                             "https://peraturan.bpk.go.id" + law.detailUrl,
@@ -280,68 +257,13 @@ export default function ChooseLawsComponent({
                         )}
                       </div>
                     </div>
-                    <div className="w-full flex flex-1 align-middle justify-center items-center">
-                      {!currentSelectedTempLaws.some(
-                        (item) => item.id == law.id
-                      ) ? (
-                        <button
-                          className=" my-auto bg-emerald-400 hover:bg-emerald-600 max-w-12 rounded-lg aspect-square w-full text-4xl text-ch-almost-white"
-                          onClick={() => {
-                            if (currentSelectedTempLaws.length >= 10) {
-                              toast.warning(
-                                "Hanya dapat menambahkan maksimal 10 undang-undang"
-                              );
-                              return;
-                            }
-                            setCurrentTempSelectedLaws([
-                              ...currentSelectedTempLaws,
-                              law,
-                            ]);
-                          }}
-                        >
-                          +
-                        </button>
-                      ) : (
-                        <button
-                          className=" my-auto bg-red-400 hover:bg-red-600 max-w-12 rounded-lg aspect-square w-full text-4xl text-ch-almost-white"
-                          onClick={() => {
-                            setCurrentTempSelectedLaws(
-                              currentSelectedTempLaws.filter(
-                                (l) => law.id !== l.id
-                              )
-                            );
-                          }}
-                        >
-                          -
-                        </button>
-                      )}
-                    </div>
+                    <div className="w-full flex flex-1 align-middle justify-center items-center"></div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         )}
-        <div className=" order-1 md:order-2 md:flex-[40%] rounded-md md:p-4">
-          <div className="flex space-x-1 align-middle items-center">
-            <p>Undang-Undang yang dipilih</p>
-            <button
-              className=" bg-ch-coral hover:bg-ch-brick-red rounded-md px-2 py-1 text-white"
-              onClick={() => {
-                setCurrentTempSelectedLaws([]);
-              }}
-            >
-              Reset
-            </button>
-          </div>
-          <div className=" flex flex-wrap space-y-1">
-            {currentSelectedTempLaws.map((law) => (
-              <button className="text-xs mr-2 rounded-md min-h-8  max-w-32 px-2 py-1 bg-blue-300 hover:bg-blue-500 font-medium line-clamp-1">
-                {law.title}
-              </button>
-            ))}
-          </div>
-        </div>
       </div>
       {!isLoading && data && (
         <div className="flex justify-center pt-4">
@@ -405,21 +327,6 @@ export default function ChooseLawsComponent({
           </p>
         </div>
       )}
-
-      <div className="flex w-full justify-around my-4 text-white">
-        <button
-          className=" bg-red-500  w-24 hover:bg-red-700 font-bold px-4 py-2 rounded-md"
-          onClick={() => setIsSelectLawsDialogOpen(false)}
-        >
-          Batal
-        </button>
-        <button
-          className=" bg-emerald-500  w-24 hover:bg-emerald-700 font-bold px-4 py-2 rounded-md"
-          onClick={handleSaveClick}
-        >
-          Simpan
-        </button>
-      </div>
     </div>
   );
 }

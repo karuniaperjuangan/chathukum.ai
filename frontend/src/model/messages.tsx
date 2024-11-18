@@ -1,5 +1,4 @@
-
-export interface Message{
-    content:string,
-    role: "human" | "ai" | "system"
+export interface Message {
+  content: string;
+  role: "human" | "ai" | "system";
 }

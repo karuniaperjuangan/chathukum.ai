@@ -1,6 +1,6 @@
-export interface ChatHistory{
-    id:number,
-    userId:number,
-    title:string,
-    lawIds:number[],
+export interface ChatHistory {
+  id: number;
+  userId: number;
+  title: string;
+  lawIds: number[];
 }
