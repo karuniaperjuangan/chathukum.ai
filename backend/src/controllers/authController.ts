@@ -5,10 +5,25 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
+import { z } from 'zod';
 
 process.env.SALT = process.env.SALT || process.env.JWT_SECRET || "this_is_a_secret_salt"
 
+const registrationSchema = z.object({
+    username: z.string().min(8, { message: 'Username must be at least 8 characters long.' }),
+    password: z.string().min(8, { message: 'Password must be at least 8 characters long.' }),
+    email: z.string().email({ message: 'Invalid email address.' }),
+  });
+  
 export async function registerUser(req: Request, res: Response) {
+    try{
+        const {username, password, email} = registrationSchema.parse(req.body)
+    } catch (error) {
+        if(error instanceof z.ZodError){
+            res.status(400).json({message: error.issues})
+            return;
+        }
+    }
     const { username, password, email } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10); // Assuming you have bcrypt installed and set up
 
