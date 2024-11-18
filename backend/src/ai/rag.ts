@@ -1,4 +1,4 @@
-import { chromaVectorStore } from "../vectorDB/chroma"
+import { postgresVectorStore } from "../vectorDB/vectorStore"
 import { RunnablePassthrough, RunnableSequence } from "@langchain/core/runnables";
 import { chatModel } from "./chatModel";
 import { StringOutputParser } from "@langchain/core/output_parsers";
@@ -16,7 +16,7 @@ export async function getAnswerFromRAG(input: ChatbotInput) {
         if (input.lawIds.length === 0) throw Error("Law IDs cannot be empty");
 
         // Initialize a retriever wrapper around the vector store
-        const result = ((await chromaVectorStore.similaritySearchWithScore(input.question, 10, {
+        const result = ((await postgresVectorStore.similaritySearchWithScore(input.question, 10, {
             "$or": (input.lawIds.map(id => ({ lawId: id }))
                 .concat([{ lawId: input.lawIds[0] }])) // to make sure that at least two laws are returned
         })).map(item => `Judul:${item[0].metadata['title']}\nIsi:\n${item[0].pageContent}`)).join('\n\n') || 'Tidak ada hasil yang relevan.';

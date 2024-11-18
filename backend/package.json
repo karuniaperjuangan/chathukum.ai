@@ -22,9 +22,9 @@
     "drizzle-orm": "^0.36.1"
   },
   "dependencies": {
-    "@langchain/community": "^0.3.12",
-    "@langchain/core": "^0.3.17",
-    "@langchain/openai": "^0.3.12",
+    "@langchain/community": "^0.3.15",
+    "@langchain/core": "^0.3.18",
+    "@langchain/openai": "^0.3.13",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/pdf-parse": "^1.1.4",
@@ -43,6 +43,7 @@
     "pdfjs-dist": "^4.8.69",
     "pg": "^8.13.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^11.0.3"
   }
 }

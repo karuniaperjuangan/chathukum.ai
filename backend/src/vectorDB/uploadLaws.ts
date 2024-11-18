@@ -2,10 +2,11 @@ import { eq, and } from "drizzle-orm";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { db } from "../db";
 import { lawUrlTable, lawDataTable, lawVectordbStatusTable } from "../db/schema";
-import { chromaVectorStore } from "./chroma";
+import { postgresVectorStore } from "./vectorStore";
 import { Document } from "langchain/document";
 const pdfjsLib = require("pdfjs-dist");
 import type { TextItem } from "pdfjs-dist/types/src/display/api";
+import { v4 } from "uuid";
 //pdfjsLib.GlobalWorkerOptions.workerSrc = require('pdfjs-dist/build/pdf.worker.entry');
 
 async function extractTextFromPDFUrl(url: string) {
@@ -94,7 +95,8 @@ async function uploadLawtoVectorDB(lawTitle: string, lawContent: string, lawId: 
             });
         })
         // add document to vector store
-        const ids = await chromaVectorStore.addDocuments(documents);
+        let ids = Array.from({ length: documents.length }, (_, i) => v4());
+        await postgresVectorStore.addDocuments(documents,{ids:ids});
         await db.insert(lawVectordbStatusTable).values({
             lawId: lawId,
             hasVectordbRecord: true,

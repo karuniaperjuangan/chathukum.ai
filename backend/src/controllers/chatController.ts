@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { chromaVectorStore } from '../vectorDB/chroma.ts';
+import { postgresVectorStore } from '../vectorDB/vectorStore.ts';
 import { uploadMultipleLaws } from '../vectorDB/uploadLaws.ts';
 import { getAnswerFromRAG } from '../ai/rag.ts';
 import { generateChatHistoryTitle } from '../ai/generateChatHistoryTitle.ts';
@@ -32,7 +32,7 @@ export async function retrieveLawContent(req: Request, res: Response) {
             throw new Error("Law IDs are required");
         }
         const ids = await uploadMultipleLaws(lawIds);
-        const result = (await chromaVectorStore.similaritySearchWithScore(query, 10, {
+        const result = (await postgresVectorStore.similaritySearchWithScore(query, 10, {
             "$or": (lawIds.map(id => ({ lawId: id }))
                 .concat([{ lawId: lawIds[0] }
                 ]

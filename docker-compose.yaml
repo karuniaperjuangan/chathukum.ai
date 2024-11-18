@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   postgres:
-    image: postgres:alpine3.20
+    image: pgvector/pgvector:pg17
     ports:
       - 5432:5432
     volumes:
@@ -11,27 +11,24 @@ services:
       - POSTGRES_PASSWORD=mysecretpassword
       - POSTGRES_USER=myusername
       - POSTGRES_DB=law
-  chroma:
-    image: chromadb/chroma:0.5.10
-    ports:
-      - 8000:8000
-    volumes:
-      - chroma-data:/chroma/chroma
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    profiles:
+      - prod
     ports: 
       - 6789:6789
     depends_on:
       - postgres
-      - chroma
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
       - 80:80
+    profiles:
+      - prod
     depends_on:
       - backend
 
