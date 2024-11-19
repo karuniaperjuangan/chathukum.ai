@@ -1,6 +1,7 @@
 {
   "name": "law-document-management",
   "module": "index.ts",
+  "main": "index.ts",
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest",
@@ -17,7 +18,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node src/index.ts",
     "debug": "bun run --hot src/index.ts"
 
   },
