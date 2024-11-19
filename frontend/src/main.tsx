@@ -45,6 +45,7 @@ const router = createBrowserRouter([
 const queryClient = new QueryClient();
 
 function MainApp() {
+  console.log(import.meta.env.VITE_API_BASE_URL)
   const [currentSelectedLaws, setCurrentSelectedLaws] = useState<Law[]>([]);
   return (
     <QueryClientProvider client={queryClient}>
