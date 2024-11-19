@@ -46,6 +46,7 @@ const queryClient = new QueryClient();
 
 function MainApp() {
   const [currentSelectedLaws, setCurrentSelectedLaws] = useState<Law[]>([]);
+  console.log(import.meta.env.VITE_BASE_API_URL)
   return (
     <QueryClientProvider client={queryClient}>
       <SelectedLawsContext.Provider
