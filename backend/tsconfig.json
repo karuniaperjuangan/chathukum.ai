@@ -4,7 +4,7 @@
     // Enable latest features
     "lib": ["ESNext", "DOM"],
     "target": "ES2020",
-    "module": "ESNext",
+    "module": "esnext",
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,

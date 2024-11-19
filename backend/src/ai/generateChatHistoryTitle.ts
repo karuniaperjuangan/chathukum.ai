@@ -1,7 +1,7 @@
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { chatModel } from "./chatModel";
-import { generateChatHistoryTitlePrompt } from "./prompt";
-import type { Message } from "../model/message";
+import { chatModel } from "./chatModel.js";
+import { generateChatHistoryTitlePrompt } from "./prompt.js";
+import type { Message } from "../model/message.js";
 
 export async function generateChatHistoryTitle(messages: Message[]) {
     // Message is an array of two strings, the first being the role of sender and the second being the message

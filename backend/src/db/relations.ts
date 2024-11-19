@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm/relations";
-import { lawDataTable, lawVectordbStatusTable, chatHistoryTable, messagesTable, lawStatusTable, lawUrlTable, usersTable } from "./schema";
+import { lawDataTable, lawVectordbStatusTable, chatHistoryTable, messagesTable, lawStatusTable, lawUrlTable, usersTable } from "./schema.js";
 
 export const lawVectordbStatusRelations = relations(lawVectordbStatusTable, ({one}) => ({
 	lawDatum: one(lawDataTable, {

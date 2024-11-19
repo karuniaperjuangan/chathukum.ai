@@ -1,12 +1,12 @@
 import express from "express"
 import 'dotenv/config'
-import chatRouter from "./routes/chat"
-import lawRouter from './routes/law'
-import authRouter from './routes/auth'
-import rootRouter from './routes/root'
+import chatRouter from "./routes/chat.js"
+import lawRouter from './routes/law.js'
+import authRouter from './routes/auth.js'
+import rootRouter from './routes/root.js'
 
 import swaggerUi from 'swagger-ui-express';
-import swaggerSpec from './swaggerConfig';
+import swaggerSpec from './swaggerConfig.js';
 import swaggerJSDoc from "swagger-jsdoc"
 import { drizzle } from 'drizzle-orm/node-postgres';
 import cors from 'cors'

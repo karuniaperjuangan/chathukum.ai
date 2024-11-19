@@ -1,12 +1,12 @@
 import { type Request, type Response } from 'express';
-import { postgresVectorStore } from '../vectorDB/vectorStore';
-import { uploadMultipleLaws } from '../vectorDB/uploadLaws';
-import { getAnswerFromRAG } from '../ai/rag';
-import { generateChatHistoryTitle } from '../ai/generateChatHistoryTitle';
-import { db } from '../db';
-import { chatHistoryTable, messagesTable } from '../db/schema';
+import { postgresVectorStore } from '../vectorDB/vectorStore.js';
+import { uploadMultipleLaws } from '../vectorDB/uploadLaws.js';
+import { getAnswerFromRAG } from '../ai/rag.js';
+import { generateChatHistoryTitle } from '../ai/generateChatHistoryTitle.js';
+import { db } from '../db.js';
+import { chatHistoryTable, messagesTable } from '../db/schema.js';
 import { eq } from 'drizzle-orm';
-import type { Message } from '../model/message';
+import type { Message } from '../model/message.js';
 
 export async function processLawPDF(req: Request, res: Response) {
     const lawIds: string[] = req.body.law_ids;

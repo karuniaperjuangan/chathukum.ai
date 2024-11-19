@@ -20,7 +20,6 @@
     "build": "tsc",
     "start": "node src/index.ts",
     "debug": "bun run --hot src/index.ts"
-
   },
   "overrides": {
     "drizzle-orm": "^0.36.1"

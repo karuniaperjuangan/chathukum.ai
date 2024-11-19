@@ -1,7 +1,7 @@
 import { Chroma } from "@langchain/community/vectorstores/chroma";
 import { OpenAIEmbeddings } from "@langchain/openai";
 import 'dotenv/config';
-import { embeddingsModel } from "../ai/embeddingModel";
+import { embeddingsModel } from "../ai/embeddingModel.js";
 import {
     PGVectorStore,
     type DistanceStrategy,

@@ -1,8 +1,8 @@
-import { postgresVectorStore } from "../vectorDB/vectorStore"
+import { postgresVectorStore } from "../vectorDB/vectorStore.js"
 import { RunnablePassthrough, RunnableSequence } from "@langchain/core/runnables";
-import { chatModel } from "./chatModel";
+import { chatModel } from "./chatModel.js";
 import { StringOutputParser } from "@langchain/core/output_parsers";
-import { ragPrompt } from "./prompt";
+import { ragPrompt } from "./prompt.js";
 
 interface ChatbotInput {
     question: string;

@@ -1,8 +1,8 @@
 import express from "express"
 import { ChatOpenAI } from "@langchain/openai";
 import { HumanMessage, SystemMessage } from "@langchain/core/messages";
-import { processLawPDF, retrieveLawContent, chatWithLawAssistant, newChatHistory, appendChatHistory, deleteChatHistory, getChatHistory, listUserChatHistories } from '../controllers/chatController'
-import { authenticateToken } from "../middleware/auth";
+import { processLawPDF, retrieveLawContent, chatWithLawAssistant, newChatHistory, appendChatHistory, deleteChatHistory, getChatHistory, listUserChatHistories } from '../controllers/chatController.js'
+import { authenticateToken } from "../middleware/auth.js";
 const router = express.Router()
 
 /**

@@ -1,8 +1,8 @@
 import { eq, and } from "drizzle-orm";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { db } from "../db";
-import { lawUrlTable, lawDataTable, lawVectordbStatusTable } from "../db/schema";
-import { postgresVectorStore } from "./vectorStore";
+import { db } from "../db.js";
+import { lawUrlTable, lawDataTable, lawVectordbStatusTable } from "../db/schema.js";
+import { postgresVectorStore } from "./vectorStore.js";
 import { Document } from "langchain/document";
 const pdfjsLib = require("pdfjs-dist");
 import type { TextItem } from "pdfjs-dist/types/src/display/api";
