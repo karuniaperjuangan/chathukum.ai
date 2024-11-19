@@ -4,8 +4,8 @@ import { db } from "../db.js";
 import { lawUrlTable, lawDataTable, lawVectordbStatusTable } from "../db/schema.js";
 import { postgresVectorStore } from "./vectorStore.js";
 import { Document } from "langchain/document";
-const pdfjsLib = require("pdfjs-dist");
-import type { TextItem } from "pdfjs-dist/types/src/display/api";
+import pdfjsLib from "pdfjs-dist";
+import type { TextItem, TextMarkedContent } from "pdfjs-dist/types/src/display/api";
 import { v4 } from "uuid";
 //pdfjsLib.GlobalWorkerOptions.workerSrc = require('pdfjs-dist/build/pdf.worker.entry');
 
@@ -25,8 +25,13 @@ async function extractTextFromPDFUrl(url: string) {
             const pageText = await page.getTextContent();
 
             // Extract text content from each item
-            const pageTextString = pageText.items.map((item: TextItem) => {
-                return (item).str
+            const pageTextString = pageText.items.map((item: TextItem | TextMarkedContent) => {
+                // Check if the item is of type TextItem before accessing its properties
+                if ((item as TextItem).str) {
+                    return (item as TextItem).str;
+                }
+                // Handle the case where item is of type TextMarkedContent
+                return ''; // Or handle it differently depending on your requirements
             }).join(' ');
             text += pageTextString + '\n'; // add a newline after each page's text
         }
