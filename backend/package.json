@@ -16,7 +16,8 @@
     "typescript": "^5.6.3"
   },
   "scripts": {
-    "start": "bun run src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
     "debug": "bun run --hot src/index.ts"
 
   },
