@@ -16,7 +16,8 @@
     "typescript": "^5.0.0"
   },
   "scripts": {
-    "start": "bun --hot run src/index.ts"
+    "start": "node src/index.ts",
+    "debug": "bun --hot run src/index.ts"
   },
   "overrides": {
     "drizzle-orm": "^0.36.1"

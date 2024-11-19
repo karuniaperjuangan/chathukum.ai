@@ -2,12 +2,12 @@
     "version": 2,
     "builds": [
         {
-          "src": "src/index.ts",
+          "src": "src/index.js",
           "use": "@vercel/node",
           "config": { "runtime": "bun" }
         }
       ],
     "routes": [
-      { "src": "/(.*)", "dest": "src/index.ts" }
+      { "src": "/(.*)", "dest": "src/index.js" }
     ]
   }
