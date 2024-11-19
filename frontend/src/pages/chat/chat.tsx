@@ -243,7 +243,7 @@ export default function ChatbotPage() {
         onClose={() => setIsSelectLawsDialogOpen(false)}
         className="relative z-50"
       >
-        <div className="fixed inset-0 flex items-center justify-center p-12 h-screen w-screen">
+        <div className="fixed inset-0 flex items-center justify-center p-6 lg:p-12 h-screen w-screen">
           <div className="relative w-full h-full">
             <button
               onClick={() => setIsSelectLawsDialogOpen(false)}

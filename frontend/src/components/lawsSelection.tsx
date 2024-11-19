@@ -149,11 +149,11 @@ export default function ChooseLawsComponent({
   });
   return (
     <div className="h-full w-full px-12 flex flex-col py-4">
-      <h1 className=" text-2xl font-bold text-center">
+      <h1 className=" md:text-2xl font-bold text-center">
         Edit Daftar Dokumen Undang-Undang dan Peraturan
       </h1>
 
-      <p className=" text-justify  py-2">
+      <p className=" text-sm line-clamp-3 md:text-base text-justify  py-2">
         Klik tombol hijau di samping sebuah dokumen untuk menambahkan dokumen
         tersebut ke dalam daftar dokumen yang digunakan AI untuk menjawab
         pertanyaan. Anda dapat memilih hingga 10 dokumen undang-undang atau

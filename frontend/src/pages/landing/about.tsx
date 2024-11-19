@@ -27,6 +27,13 @@ export default function AboutPage() {
           >
             Bijak Memilih
           </a>
+          . Informasi peraturan perundang-undangan diambil dari situs{" "}
+          <a
+            href="https://peraturan.bpk.go.id"
+            className="text-ch-coral hover:text-ch-brick-red"
+          >
+            Peraturan BPK
+          </a>
         </p>
         <h2 className="text-4xl font-bold text-center mt-8">
           Teknologi yang digunakan
