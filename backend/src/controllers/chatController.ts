@@ -1,10 +1,10 @@
 import { type Request, type Response } from 'express';
-import { postgresVectorStore } from '../vectorDB/vectorStore.ts';
-import { uploadMultipleLaws } from '../vectorDB/uploadLaws.ts';
-import { getAnswerFromRAG } from '../ai/rag.ts';
-import { generateChatHistoryTitle } from '../ai/generateChatHistoryTitle.ts';
-import { db } from '../db.ts';
-import { chatHistoryTable, messagesTable } from '../db/schema.ts';
+import { postgresVectorStore } from '../vectorDB/vectorStore';
+import { uploadMultipleLaws } from '../vectorDB/uploadLaws';
+import { getAnswerFromRAG } from '../ai/rag';
+import { generateChatHistoryTitle } from '../ai/generateChatHistoryTitle';
+import { db } from '../db';
+import { chatHistoryTable, messagesTable } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import type { Message } from '../model/message.tsx';
 

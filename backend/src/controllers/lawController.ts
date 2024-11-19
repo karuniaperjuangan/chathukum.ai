@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
-import { db } from '../db.ts';
-import { lawDataTable, lawStatusTable, lawUrlTable } from '../db/schema.ts';
+import { db } from '../db';
+import { lawDataTable, lawStatusTable, lawUrlTable } from '../db/schema';
 import { eq, sql, and, count, ilike, inArray } from 'drizzle-orm';
 
 
