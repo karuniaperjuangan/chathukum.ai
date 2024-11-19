@@ -6,6 +6,6 @@ export default {
   out: './src/db/',           // Output directory for generated code
   dialect: 'postgresql',              // Database driver
   dbCredentials: {
-    url: 'postgresql://myusername:mysecretpassword@localhost:5432/law'
+    url: process.env.DATABASE_URL || ''
   },
 } satisfies Config;
