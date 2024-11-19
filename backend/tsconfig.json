@@ -12,7 +12,6 @@
     // Bundler mode
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "verbatimModuleSyntax": true,
 
     // Best practices
     "strict": true,

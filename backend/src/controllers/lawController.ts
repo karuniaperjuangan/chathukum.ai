@@ -32,7 +32,7 @@ async function getAllLaws(req: Request, res: Response) {
             listConditions.push(eq(lawDataTable.category as any, category));
         }
         if(law_ids){
-        const lawIdsArray = law_ids.matchAll(/(\d+)/g).map(match => parseInt(match[1], 10)).toArray(); // Extract numbers from the string            
+        const lawIdsArray = Array.from(law_ids.matchAll(/(\d+)/g),match => parseInt(match[1], 10)); // Extract numbers from the string            
             listConditions.push(inArray(lawDataTable.id,lawIdsArray))
         }
 

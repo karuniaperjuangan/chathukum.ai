@@ -6,7 +6,7 @@ import { generateChatHistoryTitle } from '../ai/generateChatHistoryTitle';
 import { db } from '../db';
 import { chatHistoryTable, messagesTable } from '../db/schema';
 import { eq } from 'drizzle-orm';
-import type { Message } from '../model/message.tsx';
+import type { Message } from '../model/message';
 
 export async function processLawPDF(req: Request, res: Response) {
     const lawIds: string[] = req.body.law_ids;
