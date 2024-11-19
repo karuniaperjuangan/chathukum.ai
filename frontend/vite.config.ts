@@ -7,6 +7,6 @@ import react from '@vitejs/plugin-react-swc'
 export default defineConfig({
   plugins: [react()],
   define: {
-    "VITE_BASE_API_URL": process.env.VITE_BASE_API_URL,
+    "VITE_BASE_API_URL": `${process.env.VITE_BASE_API_URL}`,
   },
 });
