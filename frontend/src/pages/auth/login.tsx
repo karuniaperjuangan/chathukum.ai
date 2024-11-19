@@ -16,12 +16,12 @@ export default function LoginPage() {
       }
     );
     if (response.ok) {
-      toast.success("Login successful");
+      toast.success("Berhasil Login!");
       const data = await response.json();
       localStorage.setItem("token", data.token); // Store token in local storage
       window.location.href = "/chat"; // Redirect to dashboard after login success
     } else {
-      toast.error("Login failed");
+      toast.error("Gagal login! "+response.statusText);
     }
   }
   return (

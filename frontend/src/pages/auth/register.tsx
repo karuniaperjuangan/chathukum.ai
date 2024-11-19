@@ -34,12 +34,12 @@ export default function RegisterPage() {
       }
     );
     if (response.ok) {
-      toast.success("Registration successful");
+      toast.success("Berhasil mendaftar!");
       setTimeout(() => {
         window.location.href = "/auth/login"; // Redirect to dashboard after login success
       }, 1000); // Delay for 1 second before redirecting
     } else {
-      toast.error("Registration failed");
+      toast.error("Gagal mendaftar!"+response.statusText);
     }
   }
   return (

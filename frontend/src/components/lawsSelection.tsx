@@ -79,7 +79,7 @@ export default function ChooseLawsComponent({
         }).toString()
     );
     if (!response.ok) {
-      throw new Error("Failed to fetch laws");
+      throw new Error("Gagal mengambil informasi undang-undang!");
     }
     return response.json();
   };
